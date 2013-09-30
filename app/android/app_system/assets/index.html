@@ -1,0 +1,86 @@
+<html>
+<head>
+<title>
+Crosswalk Sample Application
+</title>
+</head>
+<body>
+<script>
+window.onload = function() {
+  try {
+    navigator.system.getCPUInfo(function(cpu) {
+        console.log(cpu);
+        document.getElementById("cpu").innerHTML = "Result cpu cores: " + cpu.cpuNum + "<br>cpu Arch:" + cpu.cpuArch + "<br>cpu Load:" + cpu.cpuLoad;
+      });
+    navigator.system.getDisplayInfo(function(display) {
+        console.log(display);
+        var msg = "";
+        for (var i = 0; i < display.displays.length; ++i) {
+          var prop = Object.getOwnPropertyNames(display.displays[i]);
+          for (var j = 0; j < prop.length; ++j) {
+            msg += prop[j] + ": " + display.displays[i][prop[j]] + "<br>";
+          }
+        }
+        document.getElementById("display").innerHTML = "Display: " + msg;
+      });
+    navigator.system.getMemoryInfo(function(memory) {
+        console.log(memory);
+        document.getElementById("memory").innerHTML = "Result: " + memory.capacity / 1024 + "MB-" + memory.availableCapacity / 1024 + "MB";
+      });
+    navigator.system.getStorageInfo(function(storage) {
+        console.log(storage);
+        var msg = "";
+        for (var i = 0; i < storage.storages.length; ++i) {
+          var prop = Object.getOwnPropertyNames(storage.storages[i]);
+          for (var j = 0; j < prop.length; ++j) {
+            msg += prop[j] + ": " + storage.storages[i][prop[j]] + "<br>";
+          }
+        }
+        document.getElementById("storage").innerHTML = "Result: " + msg;
+      });
+    onattach_num = 0;
+    navigator.system.addEventListener("onattach", function(msg) {
+        console.log(msg);
+        onattach_num += 1;
+        document.getElementById("onattach").innerHTML = "Storage: " + onattach_num + "-" + msg.content;
+      });
+    ondetach_num = 0;
+    navigator.system.addEventListener("ondetach", function(msg) {
+        console.log(msg);
+        ondetach_num += 1;
+        document.getElementById("ondetach").innerHTML = "Storage: " + ondetach_num + "-" + msg.content;
+      });
+    navigator.system.addEventListener("onconnect", function(msg) {
+        console.log(msg);
+        document.getElementById("onconnect").innerHTML = "Display: " + msg.content + " connect.";
+      });
+    navigator.system.addEventListener("ondisconnect", function(msg) {
+        console.log(msg);
+        document.getElementById("ondisconnect").innerHTML = "Display: " + msg.content + " disconnect.";
+      });
+  } catch(e) {
+    console.log(e);
+  }
+};
+</script>
+<div style="text-align:center;margin:50;font-size:32;font-weight:bold">
+SysApp EXAMPLE
+</div>
+<div style="text-align:center;margin:20;font-size:24">
+  <p>getCpuInfo</p>
+  <p id="cpu">TESTTEST</p>
+  <p>getDisplayInfo</p>
+  <p id="display">TESTTEST</p>
+  <p>getMemoryInfo</p>
+  <p id="memory">TESTTEST</p>
+  <p>getStorageInfo</p>
+  <p id="storage">TESTTEST</p>
+  <p>listenStorage</p>
+  <p id="onattach">TESTTEST</p>
+  <p id="ondetach">TESTTEST</p>
+  <p>listenDisplay</p>
+  <p id="onconnect">TESTTEST</p>
+  <p id="ondisconnect">TESTTEST</p>
+</div>
+</body>
+</html>
