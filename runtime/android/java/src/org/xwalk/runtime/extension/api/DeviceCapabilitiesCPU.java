@@ -43,11 +43,19 @@ public class DeviceCapabilitiesCPU {
         JSONObject outputObject = new JSONObject();
         if (getCPUCoreNumber() && getCPUArch() && getCPULoad()) {
             try {
-                outputObject.put("cpuNum", mCoreNum);
-                outputObject.put("mCPUArch", mCPUArch);
-                outputObject.put("mCPULoad", mCPULoad);
+                outputObject.put("numOfProcessors", mCoreNum);
+                outputObject.put("archName", mCPUArch);
+                outputObject.put("load", mCPULoad);
             } catch (JSONException e) {
-                return outputObject;
+                return setErrorMessage(e.toString());
+            }
+        } else {
+            try {
+                outputObject.put("numOfProcessors", 0);
+                outputObject.put("archName", "");
+                outputObject.put("load", 0.0);
+            } catch (JSONException e) {
+                return setErrorMessage(e.toString());
             }
         }
         return outputObject;
@@ -129,5 +137,14 @@ public class DeviceCapabilitiesCPU {
             return false;
         }
         return true;
+    }
+
+    private JSONObject setErrorMessage(String error) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("error", error);
+        } catch (JSONException e) {
+        }
+        return jsonObject;
     }
 }

@@ -48,11 +48,11 @@ public class DeviceCapabilitiesDisplay {
         public void onDisplayAdded(int displayId) {
             JSONObject displayObject = new JSONObject();
             try {
-                displayObject.put("cmd", "connectDisplay");
+                displayObject.put("reply", "connectDisplay");
                 displayObject.put("eventName", "onconnect");
                 displayObject.put("content", displayId);
             } catch (JSONException e) {
-                mDeviceCapabilities.postMessage("display listener error");
+                mDeviceCapabilities.sendErrorMessage(e);
             }
             mDeviceCapabilities.postMessage(displayObject.toString());
         }
@@ -75,11 +75,11 @@ public class DeviceCapabilitiesDisplay {
         public void onDisplayRemoved(int displayId) {
             JSONObject displayObject = new JSONObject();
             try {
-                displayObject.put("cmd", "disconnectDisplay");
+                displayObject.put("reply", "disconnectDisplay");
                 displayObject.put("eventName", "ondisconnect");
                 displayObject.put("content", displayId);
             } catch (JSONException e) {
-                mDeviceCapabilities.postMessage("display listener error");
+                mDeviceCapabilities.sendErrorMessage(e);
             }
             mDeviceCapabilities.postMessage(displayObject.toString());
         }
@@ -93,7 +93,8 @@ public class DeviceCapabilitiesDisplay {
         mExtensionContext = context;
     }
 
-    public JSONArray getInfo() {
+    public JSONObject getInfo() {
+        JSONObject outputObject = new JSONObject();
         JSONArray outputArray = new JSONArray();
 
         mContext = mExtensionContext.getContext();
@@ -101,27 +102,28 @@ public class DeviceCapabilitiesDisplay {
                 (DisplayManager) mContext.getSystemService(Context.DISPLAY_SERVICE);
         Display[] dispArr = mDisplayManager.getDisplays();
 
-        for (Display disp : dispArr) {
-            JSONObject displayObject = new JSONObject();
-            if (getDisplayInfo(disp)) {
-                try {
+        try {
+            for (Display disp : dispArr) {
+                JSONObject displayObject = new JSONObject();
+                if (getDisplayInfo(disp)) {
                     displayObject.put("id", mDisplayId);
-                    displayObject.put("mDisplayName", mDisplayName);
-                    displayObject.put("mIsPrimary", mIsPrimary);
+                    displayObject.put("name", mDisplayName);
+                    displayObject.put("isPrimary", mIsPrimary);
                     displayObject.put("isInternal", mIsInternal);
-                    displayObject.put("mDpiX", mDpiX);
-                    displayObject.put("mDpiY", mDpiY);
-                    displayObject.put("mWidth", mWidth);
-                    displayObject.put("mHeight", mHeight);
-                    displayObject.put("mAvailableWidth", mAvailableWidth);
-                    displayObject.put("mAvailableHeight", mAvailableHeight);
-                } catch (JSONException e) {
-                    return outputArray;
+                    displayObject.put("dpiX", mDpiX);
+                    displayObject.put("dpiY", mDpiY);
+                    displayObject.put("width", mWidth);
+                    displayObject.put("height", mHeight);
+                    displayObject.put("availWidth", mAvailableWidth);
+                    displayObject.put("availHeight", mAvailableHeight);
+                    outputArray.put(displayObject);
                 }
-                outputArray.put(displayObject);
             }
+            outputObject.put("displays", outputArray);
+        } catch (JSONException e) {
+            return setErrorMessage(e.toString());
         }
-        return outputArray;
+        return outputObject;
     }
 
     public void registerOnConnectListener() {
@@ -177,5 +179,14 @@ public class DeviceCapabilitiesDisplay {
         mAvailableWidth = outSize.x;
         mAvailableHeight = outSize.y;
         return true;
+    }
+
+    private JSONObject setErrorMessage(String error) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("error", error);
+        } catch (JSONException e) {
+        }
+        return jsonObject;
     }
 }

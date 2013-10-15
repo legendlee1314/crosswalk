@@ -31,9 +31,16 @@ public class DeviceCapabilitiesMemory {
         if (readMemoryInfo()) {
             try {
                 outputObject.put("capacity", mCapacity);
-                outputObject.put("availableCapacity", mAvailableCapacity);
+                outputObject.put("availCapacity", mAvailableCapacity);
             } catch (JSONException e) {
-                return outputObject;
+                return setErrorMessage(e.toString());
+            }
+        } else {
+            try {
+                outputObject.put("capacity", 0);
+                outputObject.put("availCapacity", 0);
+            } catch (JSONException e) {
+                return setErrorMessage(e.toString());
             }
         }
         return outputObject;
@@ -42,7 +49,7 @@ public class DeviceCapabilitiesMemory {
     private boolean readMemoryInfo() {
         /**
          * free memory calculation:
-         *   actual free memory = cached > total ? free : free + buffers + cached
+         * actual free memory = cached > total ? free : free + buffers + cached
          */
         try {
             mFileReader = new FileReader(SYSTEM_INFO_MEMORY_FILE);
@@ -68,5 +75,14 @@ public class DeviceCapabilitiesMemory {
             return false;
         }
         return true;
+    }
+
+    private JSONObject setErrorMessage(String error) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("error", error);
+        } catch (JSONException e) {
+        }
+        return jsonObject;
     }
 }

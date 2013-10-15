@@ -6,38 +6,54 @@ Crosswalk Sample Application
 </head>
 <body>
 <script>
+var Error = function(error) {
+  console.log(error);
+}
 window.onload = function() {
   try {
-    navigator.system.getCPUInfo(function(cpu) {
-        console.log(cpu);
-        document.getElementById("cpu").innerHTML = "Result cpu cores: " + cpu.cpuNum + "<br>cpu Arch:" + cpu.cpuArch + "<br>cpu Load:" + cpu.cpuLoad;
-      });
-    navigator.system.getDisplayInfo(function(display) {
-        console.log(display);
-        var msg = "";
-        for (var i = 0; i < display.displays.length; ++i) {
-          var prop = Object.getOwnPropertyNames(display.displays[i]);
-          for (var j = 0; j < prop.length; ++j) {
-            msg += prop[j] + ": " + display.displays[i][prop[j]] + "<br>";
+    //navigator.system.getCPUInfo().then(
+    //    function(cpu) {
+    //      document.getElementById("cpu").innerHTML = "Result cpu cores: " + cpu.numOfProcessors + "<br>cpu Arch:" + cpu.archName + "<br>cpu Load:" + cpu.load;
+    //    },
+    //    Error);
+    navigator.system.getCPUInfo().then(
+        function(cpu) {
+          document.getElementById("cpu").innerHTML = "Result cpu cores: " + cpu.numOfProcessors + "<br>cpu Arch:" + cpu.archName + "<br>cpu Load:" + cpu.load;
+        },
+        Error).then(
+        function(cpu) {
+          document.getElementById("cpu_then").innerHTML = "Result cpu cores: " + cpu.numOfProcessors + "<br>cpu Arch:" + cpu.archName + "<br>cpu Load:" + cpu.load;
+        },
+        Error);
+    navigator.system.getDisplayInfo().then(
+        function(display) {
+          var msg = "";
+          for (var i = 0; i < display.displays.length; ++i) {
+            var prop = Object.getOwnPropertyNames(display.displays[i]);
+            for (var j = 0; j < prop.length; ++j) {
+              msg += prop[j] + ": " + display.displays[i][prop[j]] + "<br>";
+            }
           }
-        }
-        document.getElementById("display").innerHTML = "Display: " + msg;
-      });
-    navigator.system.getMemoryInfo(function(memory) {
-        console.log(memory);
-        document.getElementById("memory").innerHTML = "Result: " + memory.capacity / 1024 + "MB-" + memory.availableCapacity / 1024 + "MB";
-      });
-    navigator.system.getStorageInfo(function(storage) {
-        console.log(storage);
-        var msg = "";
-        for (var i = 0; i < storage.storages.length; ++i) {
-          var prop = Object.getOwnPropertyNames(storage.storages[i]);
-          for (var j = 0; j < prop.length; ++j) {
-            msg += prop[j] + ": " + storage.storages[i][prop[j]] + "<br>";
+          document.getElementById("display").innerHTML = "Display: " + msg;
+        },
+        Error);
+    navigator.system.getMemoryInfo().then(
+        function(memory) {
+          document.getElementById("memory").innerHTML = "Result: " + memory.capacity / 1024 + "MB-" + memory.availCapacity / 1024 + "MB";
+        },
+        Error);
+    navigator.system.getStorageInfo().then(
+        function(storage) {
+          var msg = "";
+          for (var i = 0; i < storage.storages.length; ++i) {
+            var prop = Object.getOwnPropertyNames(storage.storages[i]);
+            for (var j = 0; j < prop.length; ++j) {
+              msg += prop[j] + ": " + storage.storages[i][prop[j]] + "<br>";
+            }
           }
-        }
-        document.getElementById("storage").innerHTML = "Result: " + msg;
-      });
+          document.getElementById("storage").innerHTML = "Result: " + msg;
+        },
+        Error);
     onattach_num = 0;
     navigator.system.addEventListener("onattach", function(msg) {
         console.log(msg);
@@ -66,9 +82,11 @@ window.onload = function() {
 <div style="text-align:center;margin:50;font-size:32;font-weight:bold">
 SysApp EXAMPLE
 </div>
-<div style="text-align:center;margin:20;font-size:24">
+<div style="text-align:center;margin:20;font-size:18">
   <p>getCpuInfo</p>
   <p id="cpu">TESTTEST</p>
+  <p>getCpuInfo Then</p>
+  <p id="cpu_then">TESTTEST</p>
   <p>getDisplayInfo</p>
   <p id="display">TESTTEST</p>
   <p>getMemoryInfo</p>

@@ -40,11 +40,11 @@ public class DeviceCapabilitiesStorage {
             if (Intent.ACTION_MEDIA_MOUNTED.equals(action)) {
                 JSONObject sdCardObject = new JSONObject();
                 try {
-                    sdCardObject.put("cmd", "attachStorage");
+                    sdCardObject.put("reply", "attachStorage");
                     sdCardObject.put("eventName", "onattach");
                     sdCardObject.put("content", "attach");
                 } catch (JSONException e) {
-                    mDeviceCapabilities.postMessage("listen onattach error");
+                    mDeviceCapabilities.sendErrorMessage(e);
                 }
                 mDeviceCapabilities.postMessage(sdCardObject.toString());
             }
@@ -60,11 +60,11 @@ public class DeviceCapabilitiesStorage {
                 || Intent.ACTION_MEDIA_BAD_REMOVAL.equals(action)) {
                 JSONObject sdCardObject = new JSONObject();
                 try {
-                    sdCardObject.put("cmd", "detachStorage");
+                    sdCardObject.put("reply", "detachStorage");
                     sdCardObject.put("eventName", "ondetach");
                     sdCardObject.put("content", "detach");
                 } catch (JSONException e) {
-                    mDeviceCapabilities.postMessage("listen ondeatch error");
+                    mDeviceCapabilities.sendErrorMessage(e);
                 }
                 mDeviceCapabilities.postMessage(sdCardObject.toString());
             }
@@ -80,10 +80,11 @@ public class DeviceCapabilitiesStorage {
         mExtensionContext = context;
     }
 
-    public JSONArray getInfo() {
+    public JSONObject getInfo() {
+        JSONObject outputObject = new JSONObject();
         JSONArray outputArray = new JSONArray();
-        if (getStorageInfo()) {
-            try {
+        try {
+            if (getStorageInfo()) {
                 JSONObject sdCardObject = new JSONObject();
                 sdCardObject.put("id", 1);
                 sdCardObject.put("name", "SDCard");
@@ -93,22 +94,23 @@ public class DeviceCapabilitiesStorage {
                     sdCardObject.put("type", "fixed");
                 }
                 sdCardObject.put("capacity", mSDCardInfo[0]);
-                sdCardObject.put("availableCapacity", mSDCardInfo[1]);
+                sdCardObject.put("availCapacity", mSDCardInfo[1]);
 
                 JSONObject internalObject = new JSONObject();
                 internalObject.put("id", 2);
                 internalObject.put("name", "Internal");
                 internalObject.put("type", "fixed");
                 internalObject.put("capacity", mInternalInfo[0]);
-                internalObject.put("availableCapacity", mInternalInfo[1]);
+                internalObject.put("availCapacity", mInternalInfo[1]);
 
                 outputArray.put(sdCardObject);
                 outputArray.put(internalObject);
-            } catch (JSONException e) {
-                return outputArray;
             }
+            outputObject.put("storages", outputArray);
+        } catch (JSONException e) {
+            return setErrorMessage(e.toString());
         }
-        return outputArray;
+        return outputObject;
     }
 
     public void registerOnAttachListener() {
@@ -167,5 +169,14 @@ public class DeviceCapabilitiesStorage {
         mIntentFilter.addAction(Intent.ACTION_MEDIA_SCANNER_STARTED);
         mIntentFilter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
         mIntentFilter.addDataScheme("file");
+    }
+
+    private JSONObject setErrorMessage(String error) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("error", error);
+        } catch (JSONException e) {
+        }
+        return jsonObject;
     }
 }

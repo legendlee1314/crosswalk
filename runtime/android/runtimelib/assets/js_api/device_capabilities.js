@@ -2,45 +2,72 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-var _callbacks = {};
-var _next_reply_id = 0;
+var _promises = {};
+var _next_promise_id = 0;
 var _listeners = {};
 var _next_listener_id = 0;
 
-var postMessage = function(msg, callback) {
-  var reply_id = _next_reply_id;
-  _next_reply_id += 1;
-  _callbacks[reply_id] = callback;
-  msg._reply_id = reply_id.toString();
+function Promise() {
+  this._thens = [];
+}
+
+Promise.prototype = {
+  then: function(onFulfilled, onRejected) {
+    this._thens.push({fulfill: onFulfilled, reject: onRejected});
+    return this;
+  },
+  fulfill: function(value) {
+    this._done('fulfill', value);
+  },
+  reject: function(error) {
+    this._done('reject', error);
+  },
+  _done: function(which, arg) {
+    this.then = which === 'fulfill' ?
+      function(fulfill, reject) {fulfill && fulfill(arg); return this;} :
+      function(fulfill, reject) {reject && reject(arg); return this;};
+    this.reject =
+      function() {throw new Error('Promise already completed.');}
+    var then, i = 0;
+    while (then = this._thens[i++]) {
+      then[which] && then[which](arg);
+    }
+    delete this._thens;
+  }
+};
+
+var postMessage = function(msg) {
+  var promise_id = _next_promise_id;
+  _next_promise_id += 1;
+  var promiseGet = new Promise();
+  _promises[promise_id] = promiseGet;
+  msg._promise_id = promise_id.toString();
   extension.postMessage(JSON.stringify(msg));
+  return promiseGet;
 };
 
-exports.getCPUInfo = function(callback) {
-  var msg = {
-    'cmd': 'getCPUInfo'
-  };
-  postMessage(msg, callback);
+exports.getCPUInfo = function() {
+  var message = {};
+  message['cmd'] = 'getCPUInfo';
+  return postMessage(message);
 };
 
-exports.getDisplayInfo = function(callback) {
-  var msg = {
-    'cmd': 'getDisplayInfo'
-  };
-  postMessage(msg, callback);
+exports.getDisplayInfo = function() {
+  var message = {};
+  message['cmd'] = 'getDisplayInfo';
+  return postMessage(message);
 };
 
-exports.getMemoryInfo = function(callback) {
-  var msg = {
-    'cmd': 'getMemoryInfo'
-  };
-  postMessage(msg, callback);
+exports.getMemoryInfo = function() {
+  var message = {};
+  message['cmd'] = 'getMemoryInfo';
+  return postMessage(message);
 };
 
 exports.getStorageInfo = function(callback) {
-  var msg = {
-    'cmd': 'getStorageInfo'
-  };
-  postMessage(msg, callback);
+  var message = {};
+  message['cmd'] = 'getStorageInfo';
+  return postMessage(message);
 };
 
 function _addConstProperty(obj, propertyKey, propertyValue) {
@@ -74,39 +101,39 @@ function _createConstClone(obj) {
 
 extension.setMessageListener(function(json) {
   var msg = JSON.parse(json);
-
-  if (msg.cmd == 'attachStorage' ||
-      msg.cmd == 'detachStorage' ||
-      msg.cmd == 'connectDisplay' ||
-      msg.cmd == 'disconnectDisplay') {
-      for (var id in _listeners) {
-        if (_listeners[id]['eventName'] === msg.eventName) {
-          _listeners[id]['callback'](_createConstClone(msg));
-        }
-      }
+  if (msg.error) {
+    console.log("Error: " + msg.error);
     return;
   }
-
-  var reply_id = msg._reply_id;
-  var callback = _callbacks[reply_id];
-  if (typeof callback === 'function') {
-    delete msg.reply_id;
-    delete _callbacks[reply_id];
-    callback(_createConstClone(msg));
-  } else {
-    console.log('Invalid reply_id: ' + reply_id);
+  if (msg.reply == 'attachStorage' ||
+      msg.reply == 'detachStorage' ||
+      msg.reply == 'connectDisplay' ||
+      msg.reply == 'disconnectDisplay') {
+    for (var id in _listeners) {
+      if (_listeners[id]['eventName'] === msg.eventName) {
+        _listeners[id]['callback'](_createConstClone(msg));
+      }
+    }
+    return;
   }
+  var promise_id = msg._promise_id;
+  delete msg._promise_id;
+  if (msg.data.error) {
+    _promises[promise_id].reject(msg.data.error);
+    delete _promises[promise_id];
+    return;
+  }
+  _promises[promise_id].fulfill(_createConstClone(msg.data)); 
+  delete _promises[promise_id];
 });
 
 var _hasListener = function(eventName) {
   var count = 0;
-
   for (var i in _listeners) {
     if (_listeners[i]['eventName'] === eventName) {
       count += 1;
     }
   }
-
   return (0 !== count);
 };
 

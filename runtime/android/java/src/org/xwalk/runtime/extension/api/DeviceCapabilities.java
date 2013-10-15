@@ -35,30 +35,30 @@ public class DeviceCapabilities extends XWalkExtension {
                 String eventName = jsonInput.getString("eventName");
                 handleAddEventListener(eventName);
             } else {
-                String replyID = jsonInput.getString("_reply_id");
-                handleGetDeviceInfo(replyID, cmd);
+                String promiseId = jsonInput.getString("_promise_id");
+                handleGetDeviceInfo(promiseId, cmd);
             }
         } catch (JSONException e) {
-            this.postMessage("error");
+            sendErrorMessage(e);
         }
     }
 
-    private void handleGetDeviceInfo(String replyID, String cmd) {
+    private void handleGetDeviceInfo(String promiseId, String cmd) {
         try {
             JSONObject jsonOutput = new JSONObject();
             if (cmd.equals("getCPUInfo")) {
-                jsonOutput = mCPU.getInfo();
+                jsonOutput.put("data", mCPU.getInfo());
             } else if (cmd.equals("getDisplayInfo")) {
-                jsonOutput.put("displays", mDisplay.getInfo());
+                jsonOutput.put("data", mDisplay.getInfo());
             } else if (cmd.equals("getMemoryInfo")) {
-                jsonOutput = mMemory.getInfo();
+                jsonOutput.put("data", mMemory.getInfo());
             } else if (cmd.equals("getStorageInfo")) {
-                jsonOutput.put("storages", mStorage.getInfo());
+                jsonOutput.put("data", mStorage.getInfo());
             }
-            jsonOutput.put("_reply_id", replyID);
+            jsonOutput.put("_promise_id", promiseId);
             this.postMessage(jsonOutput.toString());
         } catch (JSONException e) {
-            this.postMessage("error");
+            sendErrorMessage(e);
         }
     }
 
@@ -71,6 +71,15 @@ public class DeviceCapabilities extends XWalkExtension {
             mDisplay.registerOnConnectListener();
         } else if (eventName.equals("ondisconnect")) {
             mDisplay.registerOnDisonnectListener();
+        }
+    }
+
+    protected void sendErrorMessage(JSONException jsonException) {
+        try {
+            JSONObject jsonError = new JSONObject();
+            jsonError.put("error", jsonException.toString());
+            this.postMessage(jsonError.toString());
+        } catch (JSONException e) {
         }
     }
 
