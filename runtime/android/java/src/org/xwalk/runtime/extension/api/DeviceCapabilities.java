@@ -20,6 +20,7 @@ public class DeviceCapabilities extends XWalkExtension {
     private DeviceCapabilitiesDisplay mDisplay = new DeviceCapabilitiesDisplay(this);
     private DeviceCapabilitiesMemory mMemory = new DeviceCapabilitiesMemory();
     private DeviceCapabilitiesStorage mStorage = new DeviceCapabilitiesStorage(this);
+    private DeviceCapabilitiesCodecs mCodecs = new DeviceCapabilitiesCodecs();
 
     public DeviceCapabilities(String jsApiContent, XWalkExtensionContext context) {
         super(NAME, jsApiContent, context);
@@ -54,6 +55,8 @@ public class DeviceCapabilities extends XWalkExtension {
                 jsonOutput = mMemory.getInfo();
             } else if (cmd.equals("getStorageInfo")) {
                 jsonOutput.put("storages", mStorage.getInfo());
+            } else if (cmd.equals("getCodecsInfo")) {
+                jsonOutput = mCodecs.getInfo();
             }
             jsonOutput.put("_reply_id", replyID);
             this.postMessage(jsonOutput.toString());

@@ -43,6 +43,13 @@ exports.getStorageInfo = function(callback) {
   postMessage(msg, callback);
 };
 
+exports.getCodecsInfo = function(callback) {
+  var msg = {
+    'cmd': 'getCodecsInfo'
+  };
+  postMessage(msg, callback);
+};
+
 function _addConstProperty(obj, propertyKey, propertyValue) {
   Object.defineProperty(obj, propertyKey, {
     configurable: false,

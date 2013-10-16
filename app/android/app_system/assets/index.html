@@ -38,6 +38,26 @@ window.onload = function() {
         }
         document.getElementById("storage").innerHTML = "Result: " + msg;
       });
+    navigator.system.getCodecsInfo(function(codec) {
+        console.log(codec);
+        var msg = "<br>video:<br>";
+        for (var i = 0; i < codec.videoCodecs.length; ++i) {
+          var prop = Object.getOwnPropertyNames(codec.videoCodecs[i]);
+          for (var j = 0; j < prop.length; ++j) {
+            msg +=  prop[j] + ": " + codec.videoCodecs[i][prop[j]] + "<br>";
+          }
+          msg += "<br>";
+        }
+        msg += "<br>audio:<br>";
+        for (var i = 0; i < codec.audioCodecs.length; ++i) {
+          var prop = Object.getOwnPropertyNames(codec.audioCodecs[i]);
+          for (var j = 0; j < prop.length; ++j) {
+            msg += prop[j] + ": " + codec.audioCodecs[i][prop[j]] + "<br>";
+          }
+          msg += "<br>";
+        }
+        document.getElementById("codec").innerHTML = "Result: " + msg;
+      });
     onattach_num = 0;
     navigator.system.addEventListener("onattach", function(msg) {
         console.log(msg);
@@ -75,6 +95,8 @@ SysApp EXAMPLE
   <p id="memory">TESTTEST</p>
   <p>getStorageInfo</p>
   <p id="storage">TESTTEST</p>
+  <p>getCodecsInfo</p>
+  <p id="codec">TESTTEST</p>
   <p>listenStorage</p>
   <p id="onattach">TESTTEST</p>
   <p id="ondetach">TESTTEST</p>
