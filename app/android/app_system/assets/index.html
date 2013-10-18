@@ -99,12 +99,22 @@
           });
         navigator.system.addEventListener("onconnect", function(msg) {
             var output = document.getElementById("event");
-            output.value += "Display: " + msg.content + " connect." + "\n";
+            var outputmsg = "Display connect.\n";
+            var prop = Object.getOwnPropertyNames(msg.content);
+            for (var i = 0; i < prop.length; ++i) {
+              outputmsg += prop[i] + ": " + msg.content[prop[i]] + "\n";
+            }
+            output.value += outputmsg;
             output.scrollTop = output.scrollHeight;
           });
         navigator.system.addEventListener("ondisconnect", function(msg) {
             var output = document.getElementById("event");
-            output.value += "Display: " + msg.content + " disconnect." + "\n";
+            var outputmsg = "Display disconnect.\n";
+            var prop = Object.getOwnPropertyNames(msg.content);
+            for (var i = 0; i < prop.length; ++i) {
+              outputmsg += prop[i] + ": " + msg.content[prop[i]] + "\n";
+            }
+            output.value += outputmsg;
             output.scrollTop = output.scrollHeight;
           });
       } catch(e) {
