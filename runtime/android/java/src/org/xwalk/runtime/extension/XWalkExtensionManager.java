@@ -21,6 +21,7 @@ import java.util.HashMap;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xwalk.runtime.extension.api.contacts.Contacts;
 import org.xwalk.runtime.extension.api.device_capabilities.DeviceCapabilities;
 import org.xwalk.runtime.extension.api.presentation.PresentationExtension;
 
@@ -133,26 +134,30 @@ public class XWalkExtensionManager implements XWalkExtensionContext {
         //    } catch(IOException e) {
         //        Log.e(TAG, "Failed to read js API file of internal extension: Device");
         //    }
-        {
-            String jsApiContent = "";
-            try {
-                jsApiContent = getAssetsFileContent(mContext.getAssets(),
-                                                    PresentationExtension.JS_API_PATH);
-                // Load PresentationExtension as an internal extension.
-                new PresentationExtension(PresentationExtension.NAME, jsApiContent, this);
-            } catch (IOException e) {
-                Log.e(TAG, "Failed to read JS API file: " + PresentationExtension.JS_API_PATH);
-            }
+        String jsApiContent = "";
+        try {
+            jsApiContent = getAssetsFileContent(mContext.getAssets(),
+                                                PresentationExtension.JS_API_PATH);
+            // Load PresentationExtension as an internal extension.
+            new PresentationExtension(PresentationExtension.NAME, jsApiContent, mExtensionContextImpl);
+        } catch (IOException e) {
+            Log.e(TAG, "Failed to read JS API file: " + PresentationExtension.JS_API_PATH);
         }
-        {
-            String jsApiContent = "";
-            try {
-                jsApiContent = getAssetsFileContent(mContext.getAssets(),
-                                                    DeviceCapabilities.JS_API_PATH);
-                new DeviceCapabilities(jsApiContent, this);
-            } catch(IOException e) {
-                Log.e(TAG, "Failed to read JS API file: " + DeviceCapabilities.JS_API_PATH);
-            }
+
+        try {
+            jsApiContent = getAssetsFileContent(mContext.getAssets(),
+                                                Contacts.JS_API_PATH);
+            new Contacts(jsApiContent, mExtensionContextImpl);
+        } catch(IOException e) {
+            Log.e(TAG, "Failed to read JS API file: " + Contacts.JS_API_PATH);
+        }
+
+        try {
+            jsApiContent = getAssetsFileContent(mContext.getAssets(),
+                                                DeviceCapabilities.JS_API_PATH);
+            new DeviceCapabilities(jsApiContent, mExtensionContextImpl);
+        } catch(IOException e) {
+            Log.e(TAG, "Failed to read JS API file: " + DeviceCapabilities.JS_API_PATH);
         }
     }
 
