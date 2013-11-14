@@ -139,7 +139,7 @@ public class XWalkExtensionManager implements XWalkExtensionContext {
             jsApiContent = getAssetsFileContent(mContext.getAssets(),
                                                 PresentationExtension.JS_API_PATH);
             // Load PresentationExtension as an internal extension.
-            new PresentationExtension(PresentationExtension.NAME, jsApiContent, mExtensionContextImpl);
+            new PresentationExtension(PresentationExtension.NAME, jsApiContent, this);
         } catch (IOException e) {
             Log.e(TAG, "Failed to read JS API file: " + PresentationExtension.JS_API_PATH);
         }
@@ -147,7 +147,7 @@ public class XWalkExtensionManager implements XWalkExtensionContext {
         try {
             jsApiContent = getAssetsFileContent(mContext.getAssets(),
                                                 Contacts.JS_API_PATH);
-            new Contacts(jsApiContent, mExtensionContextImpl);
+            new Contacts(jsApiContent, this);
         } catch(IOException e) {
             Log.e(TAG, "Failed to read JS API file: " + Contacts.JS_API_PATH);
         }
@@ -155,7 +155,7 @@ public class XWalkExtensionManager implements XWalkExtensionContext {
         try {
             jsApiContent = getAssetsFileContent(mContext.getAssets(),
                                                 DeviceCapabilities.JS_API_PATH);
-            new DeviceCapabilities(jsApiContent, mExtensionContextImpl);
+            new DeviceCapabilities(jsApiContent, this);
         } catch(IOException e) {
             Log.e(TAG, "Failed to read JS API file: " + DeviceCapabilities.JS_API_PATH);
         }

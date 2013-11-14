@@ -1,14 +1,15 @@
 package org.xwalk.runtime.extension.api.Contacts;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.xwalk.runtime.extension.api.Contacts.ContactFinder.FindOption;
 
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.GroupMembership;
-import android.provider.ContactsContract.CommonDataKinds.Phone;
-import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.Groups;
 import android.provider.ContactsContract.RawContacts;
@@ -40,68 +41,72 @@ public class ContactUtils {
 
     private enum ListOption { All, MimeType, Fields }
     public void listContactData() {
-        listContactData(Data.CONTACT_ID, ListOption.Fields); //TODO(hdq): Will be new FindOption(null, null, Data.CONTACT_ID));
+        listContactData(new FindOption(null, null, Data.CONTACT_ID), ListOption.Fields);
     }
 
-    public void listContactData(String order, ListOption option) { //TODO(hdq): Will be FindOption findOption when find is ready
-        Cursor c = mResolver.query(RawContacts.CONTENT_URI, null, null, null, order);
+    public void listContactData(FindOption findOption, ListOption option) {
+        Cursor c = mResolver.query(RawContacts.CONTENT_URI, null,
+                findOption.where, findOption.whereArgs, findOption.sortOrder);
         Log.i(mTag, "====== Contact Raw Contact Table =========");
-        while (c.moveToNext()) {
-            long id = c.getLong(c.getColumnIndex(RawContacts._ID));
-            long contactId = c.getLong(c.getColumnIndex(RawContacts.CONTACT_ID));
-            String accountName = c.getString(c.getColumnIndex(RawContacts.ACCOUNT_NAME));
-            String accountType = c.getString(c.getColumnIndex(RawContacts.ACCOUNT_TYPE));
-            if (contactId != 0) {
-                Log.i(mTag, id
-                      + ", contactId: " + contactId
-                      + ", accountName: " + accountName
-                      + ", accountType: " + accountType
-                      );
-            }
-        }
-
-        c = mResolver.query(Data.CONTENT_URI, null, null, null, order);
-        //TODO(hdq): Cursor c = mResolver.query(Data.CONTENT_URI, null, findOption.where, findOption.whereArgs, findOption.sortOrder);
-        Log.i(mTag, "====== Contact Data Table =========");
-        while (c.moveToNext()) {
-            long contactID = c.getLong(c.getColumnIndex(Data.CONTACT_ID));
-
-            String output = "";
-            String mime = c.getString(c.getColumnIndex(Data.MIMETYPE));
-            mime = mime.substring(mime.indexOf('/')+1);
-            if (option == ListOption.All) { // This outputs all fields
-                output = String.valueOf(contactID);
-                for (String columnName : c.getColumnNames()) {
-                    String value = c.getString(c.getColumnIndex(columnName));
-                    output += ", " + columnName + ": " + value;
+        try {
+            while (c.moveToNext()) {
+                long id = c.getLong(c.getColumnIndex(RawContacts._ID));
+                long contactId = c.getLong(c.getColumnIndex(RawContacts.CONTACT_ID));
+                String accountName = c.getString(c.getColumnIndex(RawContacts.ACCOUNT_NAME));
+                String accountType = c.getString(c.getColumnIndex(RawContacts.ACCOUNT_TYPE));
+                if (contactId != 0) {
+                    Log.i(mTag, id
+                          + ", contactId: " + contactId
+                          + ", accountName: " + accountName
+                          + ", accountType: " + accountType
+                          );
                 }
-                Log.i(mTag, output);
-            } else if (option == ListOption.MimeType) { // If we interested in some mimetype
-                if (mime.equals("phone_v2")) {
+            }
+
+            c = mResolver.query(Data.CONTENT_URI, null, findOption.where, findOption.whereArgs, findOption.sortOrder);
+            Log.i(mTag, "====== Contact Data Table =========");
+            while (c.moveToNext()) {
+                long contactID = c.getLong(c.getColumnIndex(Data.CONTACT_ID));
+
+                String output = "";
+                String mime = c.getString(c.getColumnIndex(Data.MIMETYPE));
+                mime = mime.substring(mime.indexOf('/')+1);
+                if (option == ListOption.All) { // This outputs all fields
+                    output = String.valueOf(contactID);
+                    for (String columnName : c.getColumnNames()) {
+                        String value = c.getString(c.getColumnIndex(columnName));
+                        output += ", " + columnName + ": " + value;
+                    }
                     Log.i(mTag, output);
+                } else if (option == ListOption.MimeType) { // If we interested in some mimetype
+                    if (mime.equals("phone_v2")) {
+                        Log.i(mTag, output);
+                    }
+                } else if (option == ListOption.Fields) { // If we interested in some specific fields
+                    long rawId = c.getLong(c.getColumnIndex(Data.RAW_CONTACT_ID));
+                    int prefer = c.getInt(c.getColumnIndex(Data.IS_SUPER_PRIMARY));
+                    int dataVersion = c.getInt(c.getColumnIndex(Data.DATA_VERSION));
+                    String data1 = c.getString(c.getColumnIndex(Data.DATA1));
+                    String sync1 = c.getString(c.getColumnIndex(Data.SYNC1));
+                    String status = c.getString(c.getColumnIndex(Data.STATUS));
+                    int inVisibleGroup = c.getInt(c.getColumnIndex(Data.IN_VISIBLE_GROUP));
+                    int inVisible = c.getInt(Data.INVISIBLE);
+                    int available = c.getInt(Data.AVAILABLE);
+
+                    String id = c.getString(c.getColumnIndex(Data._ID));
+                    String contactPresence = c.getString(c.getColumnIndex(Data.CONTACT_PRESENCE));
+                    String hasPhoneNumber = c.getString(c.getColumnIndex(Data.HAS_PHONE_NUMBER));
+                    String starred = c.getString(c.getColumnIndex(Data.STARRED));
+
+                    Log.i(mTag, contactID
+                            + ", raw_id: " + rawId
+                            + ", data1: " + data1
+                            + ", mimetype: " + mime
+                            );
                 }
-            } else if (option == ListOption.Fields) { // If we interested in some specific fields
-                long rawId = c.getLong(c.getColumnIndex(Data.RAW_CONTACT_ID));
-                int prefer = c.getInt(c.getColumnIndex(Data.IS_SUPER_PRIMARY));
-                int dataVersion = c.getInt(c.getColumnIndex(Data.DATA_VERSION));
-                String data1 = c.getString(c.getColumnIndex(Data.DATA1));
-                String sync1 = c.getString(c.getColumnIndex(Data.SYNC1));
-                String status = c.getString(c.getColumnIndex(Data.STATUS));
-                int inVisibleGroup = c.getInt(c.getColumnIndex(Data.IN_VISIBLE_GROUP));
-                int inVisible = c.getInt(Data.INVISIBLE);
-                int available = c.getInt(Data.AVAILABLE);
-
-                String id = c.getString(c.getColumnIndex(Data._ID));
-                String contactPresence = c.getString(c.getColumnIndex(Data.CONTACT_PRESENCE));
-                String hasPhoneNumber = c.getString(c.getColumnIndex(Data.HAS_PHONE_NUMBER));
-                String starred = c.getString(c.getColumnIndex(Data.STARRED));
-
-                Log.i(mTag, contactID
-                        + ", raw_id: " + rawId
-                        + ", data1: " + data1
-                        + ", mimetype: " + mime
-                        );
             }
+        } finally {
+            c.close();
         }
     }
 
@@ -121,9 +126,9 @@ public class ContactUtils {
             return false;
         }
 
-        final Cursor cursor = mResolver.query(
+        final Cursor c = mResolver.query(
                 ContactsContract.Contacts.CONTENT_URI, null, ContactsContract.Contacts._ID +" = ?", new String[]{id}, null);
-        return cursor.getCount() != 0;
+        return c.getCount() != 0;
     }
 
     public String getRawId(String id) {
@@ -134,12 +139,41 @@ public class ContactUtils {
             new String[]{id}, null);
         try {
             if (c.moveToFirst()) {
-                rawContactId = c.getString(0);
+                rawContactId = c.getString(0); // Actually it is possible that for one contact id there are multiple rawIds
             }
         } finally {
             c.close();
         }
         return rawContactId;
+    }
+
+    public String getId(String rawId) {
+        String contactId = null;
+        Cursor c = mResolver.query(RawContacts.CONTENT_URI,
+            new String[]{RawContacts.CONTACT_ID},
+            RawContacts._ID + "=?",
+            new String[]{rawId}, null);
+        try {
+            if (c.moveToFirst()) {
+                contactId = c.getString(0);
+            }
+        } finally {
+            c.close();
+        }
+        return contactId;
+    }
+    
+    public Set<String> getCurrentRawIds() {
+        Set<String> rawIds = new HashSet<String>();
+        Cursor c = mResolver.query(RawContacts.CONTENT_URI, new String[]{RawContacts._ID}, null, null, null);
+        try {
+            while (c.moveToNext()) {
+                rawIds.add(c.getString(0));
+            }
+        } finally {
+            c.close();
+        }
+        return rawIds;
     }
 
     public long getGroupId(long id) {

@@ -56,44 +56,9 @@ var postMessage = function(msg) {
   return p;
 };
 
-function _addConstProperty(obj, propertyKey, propertyValue) {
-  Object.defineProperty(obj, propertyKey, {
-    configurable: false,
-    writable: false,
-    value: propertyValue
-  });
-}
-
-function _createConstClone(obj) {
-  var const_obj = {};
-  for (var key in obj) {
-    if (Array.isArray(obj[key])) {
-      var obj_array = obj[key];
-      var const_obj_array = [];
-      for (var i = 0; i < obj_array.length; ++i) {
-        var const_sub_obj = {};
-        for (var sub_key in obj_array[i]) {
-          _addConstProperty(const_sub_obj, sub_key, obj_array[i][sub_key]);
-        }
-        const_obj_array.push(const_sub_obj);
-      }
-      _addConstProperty(const_obj, key, const_obj_array);
-    } else {
-      _addConstProperty(const_obj, key, obj[key]);
-    }
-  }
-  return const_obj;
-}
-
 extension.setMessageListener(function(json) {
   var msg = JSON.parse(json);
-
-  if (msg.data.error) {
-    _promises[msg._promise_id].reject(msg.data.error);
-  } else {
-    _promises[msg._promise_id].fulfill(_createConstClone(msg.data));
-  }
-
+  _promises[msg._promise_id].fulfill(msg.data);
   delete _promises[msg._promise_id];
 });
 
@@ -101,5 +66,19 @@ exports.save = function(contact) {
   var msg = {};
   msg['cmd'] = 'save';
   msg['contact'] = contact;
+  return postMessage(msg);
+};
+
+exports.find = function(options) {
+  var msg = {};
+  msg['cmd'] = 'find';
+  msg['options'] = options;
+  return postMessage(msg);
+};
+
+exports.remove = function(contactId) {
+  var msg = {};
+  msg['cmd'] = 'remove';
+  msg['contactId'] = contactId;
   return postMessage(msg);
 };

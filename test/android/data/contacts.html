@@ -13,52 +13,137 @@
   .save { background-color: #FFFACD; }
   .update { background-color: #CAE1FF; }
   .find { background-color: #FFF0F5; }
+  .remove { background-color: #F0FFF0; }
 </style>
 <body>
 
 <script>
 
-var ErrorHandler = function(error) {
-  document.title = 'Fail';
-  console.log(error);
-}
-
-var successCount = 0;
-function onSuccess() {
-  ++successCount;
-  if (successCount >= 2) { // TODO(hdq) will increase it after adding more modules.
-    document.title = 'Pass';
-  }
-}
-
-function ContactName(init) {
-  this.displayName = init.displayName;
-  this.honorificPrefixes = init.honorificPrefixes;
-  this.givenNames = init.givenNames;
-  this.familyNames = init.familyNames;
-  this.nickNames = init.nickNames;
-}
-
-function ContactField(init) {
-  this.types = init.types;
-  this.prefered = init.prefered;
-  this.value = init.value;
-}
-
-function ContactTelField(init) {
-  this.carrier = init.carrier;
-  this.types = init.types;
-  this.prefered = init.prefered;
-  this.value = init.value;
-}
-
-function Contact(init) {
-  this.name = init.name;
-  this.emails = init.emails;
-  this.phoneNumbers = init.phoneNumbers;
-}
-
 window.onload = function() {
+
+  function ContactName(init) {
+    this.displayName = init.displayName;
+    this.honorificPrefixes = init.honorificPrefixes;
+    this.givenNames = init.givenNames;
+    this.familyNames = init.familyNames;
+    this.nickNames = init.nickNames;
+  }
+  
+  function ContactField(init) {
+    this.types = init.types;
+    this.prefered = init.prefered;
+    this.value = init.value;
+  }
+  
+  function ContactTelField(init) {
+    this.carrier = init.carrier;
+    this.types = init.types;
+    this.prefered = init.prefered;
+    this.value = init.value;
+  }
+  
+  function Contact(init) {
+    this.name = init.name;
+    this.emails = init.emails;
+    this.phoneNumbers = init.phoneNumbers;
+  }
+  
+  function ContactFindOptions(init) {
+    this.value = init.value;
+    this.operator = init.operator;
+    this.fields = init.fields;
+    this.sortBy = init.sortBy;
+    this.sortOrder = init.sortOrder;
+    this.resultsLimit = init.resultsLimit;
+  }
+
+  var successCount = 0;
+  function onSuccess() {
+    ++successCount;
+    // Features to test:
+    // 1. Save a new contact
+    // 2. Update a existing contact
+    // 3. Find a contact
+    if (successCount >= 3) {
+      document.title = 'Pass';
+    }
+  }
+  
+  var errorCallback = function(error) {
+    document.title = 'Fail';
+    console.log(error);
+  }
+  
+  var firstID = -1;
+  var secondID = -1;
+
+  var saveCallback = function(contact) {
+    var output = '';
+    if (firstID==-1) {
+      firstID = contact.id;
+    } else {
+      secondID = contact.id;
+      output += '<br>'
+    }
+    output +=  'Contact ' +
+      contact.id + ' ' +
+      contact.name.givenNames[0] + ' ' +
+      contact.name.familyNames[0] + ' saved!';
+    document.getElementById('save').innerHTML += output;
+    onSuccess();
+  };
+
+  var expectedNewPhoneNumber = '+4455001';
+  var updateStartCallback = function(contact) {
+    var output = 'Updating contact ' + 
+      contact.id + ' ' +
+      contact.name.givenNames[0] + ' ' +
+      contact.name.familyNames[0] + ',<br>phone number: ' +
+      contact.phoneNumbers[0].value;
+    document.getElementById('update').innerHTML = output;
+    contact.phoneNumbers[0].value = expectedNewPhoneNumber;
+    navigator.contacts.save(contact).done(updateDoneCallback, errorCallback);
+  };
+
+  var updateDoneCallback = function(contact) {
+    var output = '<p>Contact ' + 
+      contact.id + ' ' +
+      contact.name.givenNames[0] + ' ' +
+      contact.name.familyNames[0] + ' updated,<br>phone number now is: ' +
+      contact.phoneNumbers[0].value;
+    document.getElementById('update').innerHTML += output;
+    if (contact.phoneNumbers[0].value == expectedNewPhoneNumber) {
+      onSuccess();
+    }
+  };
+
+  var findStartCallback = function(c) {
+    var options = new ContactFindOptions({
+      value: 'Doe',
+      operator: 'contains',
+      fields: ['familyName'],
+      sortBy: ['familyNames'],
+      sortOrder: 'ascending',
+      resultsLimit: 3
+    });
+    navigator.contacts.find(options)
+        .done(findDoneCallback, errorCallback);
+  };
+
+  var findDoneCallback = function(contacts) {
+    var output = 'Found '+contacts.length+' contact(s):';
+    output += '<p>';
+    for(var i=0, l=contacts.length; i<l; ++i) {
+      output += contacts[i].name.givenNames[0] + ' '
+                + contacts[i].name.familyNames[0] + '<br>';
+    }
+    document.getElementById('find').innerHTML = output;
+    onSuccess();
+    navigator.contacts.remove(firstID);
+    navigator.contacts.remove(secondID);
+    output = "Contacts "+firstID+" and "+secondID+" are removed";
+    document.getElementById('remove').innerHTML = output;
+  };
 
   var contactName = new ContactName({
     givenNames: ['John'],
@@ -77,17 +162,19 @@ window.onload = function() {
   });
 
   try {
-    navigator.contacts.save(contact)
-      .done(function(contact) {
-        var output = 'Contact ' +
-          contact.name.givenNames[0] + ' ' +
-          contact.name.familyNames[0] + ' saved!';
-        document.getElementById('save').innerHTML = output;
-        onSuccess();
-      }, ErrorHandler)
-      .done(function(contact) {
-        //TODO(hdq) will add test case for update a contact based on returned contact id
-      }, ErrorHandler);
+    navigator.contacts.save(contact)             // save a contact
+      .done(saveCallback, errorCallback)         // and then print the result of saving
+      .done(updateStartCallback, errorCallback); // and then update this contact
+  } catch(e) {
+    console.log(e);
+  }
+
+  contact.name.familyNames[0] = 'Smith';
+  contact.phoneNumbers[0].value = '+1012345678';
+  try {
+    navigator.contacts.save(contact)           // save another contact
+      .done(saveCallback, errorCallback)       // and then print the result of saving
+      .done(findStartCallback, errorCallback); // and then find a contact
   } catch(e) {
     console.log(e);
   }
@@ -98,18 +185,23 @@ window.onload = function() {
 <div class="title center">Contacts API Example</div>
 
 <div class="save">
-  <p class="subtitle center">Save A Contact</p>
+  <p class="subtitle center">Save Contact</p>
   <p class="text center" id="save"></p>
 </div>
 
 <div class="update">
-  <p class="subtitle center">Update A Contact</p>
+  <p class="subtitle center">Update Contact</p>
   <p class="text center" id="update"></p>
 </div>
 
 <div class="find">
-  <p class="subtitle center">Find A Contact</p>
-  <p class="text" id="find"></p>
+  <p class="subtitle center">Find Contact</p>
+  <p class="text center" id="find"></p>
+</div>
+
+<div class="remove">
+  <p class="subtitle center">Remove Contact</p>
+  <p class="text center" id="remove"></p>
 </div>
 
 </body>

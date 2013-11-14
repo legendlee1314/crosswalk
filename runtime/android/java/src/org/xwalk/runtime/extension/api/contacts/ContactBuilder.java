@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -204,7 +206,10 @@ public class ContactBuilder {
         Builder builder = null;
         mId = mJson.getString("id");
         mIsUpdate = mUtils.hasID(mId);
+
+        Set<String> oldRawIds = null;
         if (!mIsUpdate) { // Create a null record for inserting later
+            oldRawIds = mUtils.getCurrentRawIds();
             mId = null;
             builder = ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI);
             builder.withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null);
@@ -270,7 +275,21 @@ public class ContactBuilder {
             Log.e(mTag, "Failed to apply batch: "+e);
         }
 
-        //TODO(hdq): will use Find to get "id" of contact and then add to mContact.
+        // If it is a new contact, we need to get and return its auto-generated id.
+        if (!mIsUpdate) {
+            Set<String> newRawIds = mUtils.getCurrentRawIds();
+            newRawIds.removeAll(oldRawIds);
+            if (newRawIds.size() != 1) {
+                Log.e(mTag, "build() - Something wrong after batch applied, new raw ids are: "+newRawIds.toString());
+                return mContact;
+            }
+            String id = mUtils.getId(newRawIds.iterator().next());
+            try {
+                mContact.put("id", id);
+            } catch (JSONException e) {
+                Log.e(mTag, "build() - Failed to put id "+id+" into contact");
+            }
+        }
         return mContact;
     }
 }
