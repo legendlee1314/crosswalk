@@ -14,6 +14,7 @@
   .update { background-color: #CAE1FF; }
   .find { background-color: #FFF0F5; }
   .remove { background-color: #F0FFF0; }
+  .event { background-color:  #D1D1D1; }
 </style>
 <body>
 
@@ -162,6 +163,38 @@ window.onload = function() {
   });
 
   try {
+    navigator.contacts.addEventListener('oncontactschange', function(data) {
+        var output = document.getElementById('event');
+        if (data.added) {
+          var msg = 'added: ';
+          for (var i = 0; i < data.added.length; ++i) {
+             msg += data.added[i] + '|';
+          }
+          output.value += 'contacts changes:\n' + msg + '\n--------\n';
+          output.scrollTop = output.scrollHeight;
+        }
+        if (data.removed) {
+          var msg = 'removed: ';
+          for (var i = 0; i < data.removed.length; ++i) {
+             msg += data.removed[i] + '|';
+          }
+          output.value += 'contacts changes:\n' + msg + '\n--------\n';
+          output.scrollTop = output.scrollHeight;
+        }
+        if (data.modified) {
+          var msg = 'modified: ';
+          for (var i = 0; i < data.modified.length; ++i) {
+             msg += data.modified[i] + '|';
+          }
+          output.value += 'contacts changes:\n' + msg + '\n--------\n';
+          output.scrollTop = output.scrollHeight;
+        }
+      });
+  } catch(e) {
+    console.log(e);
+  }
+
+  try {
     navigator.contacts.save(contact)             // save a contact
       .done(saveCallback, errorCallback)         // and then print the result of saving
       .done(updateStartCallback, errorCallback); // and then update this contact
@@ -202,6 +235,11 @@ window.onload = function() {
 <div class="remove">
   <p class="subtitle center">Remove Contact</p>
   <p class="text center" id="remove"></p>
+</div>
+
+<div class="event">
+  <p class="subtitle center">Contact Event</p>
+  <textarea id="event" readonly=true></textarea>
 </div>
 
 </body>
