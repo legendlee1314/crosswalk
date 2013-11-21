@@ -1,16 +1,4 @@
-package org.xwalk.runtime.extension.api.Contacts;
-
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+package org.xwalk.runtime.extension.api.contacts;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
@@ -29,6 +17,18 @@ import android.provider.ContactsContract.CommonDataKinds.StructuredPostal;
 import android.provider.ContactsContract.CommonDataKinds.Website;
 import android.util.Log;
 
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class ContactFinder {
     private ContactUtils mUtils;
     private String mFindString;
@@ -40,10 +40,14 @@ public class ContactFinder {
         this.mTag = tag;
     }
 
-    public static class FindOption { // This must be static so that it can be used outside the file
-        public String where;        // (WHERE )column_name = ? OR column_name = ?
-        public String[] whereArgs;  // "value1", "value2"
-        public String sortOrder;    // (ORDER BY )column_name, column_name ASC|DESC
+    public static class FindOption {
+        // This must be static so that it can be used outside the file
+        // (WHERE )column_name = ? OR column_name = ?
+        // "value1", "value2"
+        // (ORDER BY )column_name, column_name ASC|DESC
+        public String where;
+        public String[] whereArgs;
+        public String sortOrder;
 
         public FindOption(String where, String[] whereArgs, String sortOrder) {
             this.where = where;
@@ -90,7 +94,7 @@ public class ContactFinder {
             try {
                 o.put("id", id);
             } catch (JSONException e) {
-                Log.e(mTag, "ensurePut() - Failed to build json data: "+e);
+                Log.e(mTag, "ensurePut() - Failed to build json data: " + e);
             }
             ensurePut(o, "name", oName);
             ensurePut(o, "lastUpdated", lastUpdated);
@@ -115,12 +119,13 @@ public class ContactFinder {
                     o.put(jsonName, t);
                 }
             } catch (JSONException e) {
-                Log.e(mTag, "ensurePut() - Failed to add json data: "+e);
+                Log.e(mTag, "ensurePut() - Failed to add json data: " + e);
             }
         }
     }
 
-    private JSONObject ensureAddString(JSONObject o, Cursor c, String jsonName, String dataName) {
+    private JSONObject ensureAddString(
+            JSONObject o, Cursor c, String jsonName, String dataName) {
         try {
             if (o == null) {
                 o = new JSONObject();
@@ -130,7 +135,7 @@ public class ContactFinder {
                 o.put(jsonName, value);
             }
         } catch (JSONException e) {
-            Log.e(mTag, "addString() - Failed to build json data: "+e);
+            Log.e(mTag, "addString() - Failed to build json data: " + e);
         }
         return o;
     }
@@ -146,19 +151,21 @@ public class ContactFinder {
         return array;
     }
 
-    private JSONObject ensureAddArrayFirstValue(JSONObject o, Cursor c, String jsonName, String dataName,
-            Map<String, Integer> typeValuesMap) {
-        final String nameString = ContactUtils.getKeyFromValue(
-                typeValuesMap, Integer.valueOf(c.getString(c.getColumnIndex(dataName))));
+    private JSONObject ensureAddArrayFirstValue(JSONObject o, Cursor c,
+            String jsonName, String dataName, Map<String, Integer> typeValuesMap) {
+        final String nameString = ContactUtils.getKeyFromValue(typeValuesMap,
+                Integer.valueOf(c.getString(c.getColumnIndex(dataName))));
         return ensureAddArrayFirstValueCommon(o, c, jsonName, nameString);
     }
 
-    private JSONObject ensureAddArrayFirstValue(JSONObject o, Cursor c, String jsonName, String dataName) {
+    private JSONObject ensureAddArrayFirstValue(JSONObject o, Cursor c,
+            String jsonName, String dataName) {
         final String nameString = c.getString(c.getColumnIndex(dataName));
         return ensureAddArrayFirstValueCommon(o, c, jsonName, nameString);
     }
 
-    private JSONObject ensureAddArrayFirstValueCommon(JSONObject o, Cursor c, String jsonName, String nameString) {
+    private JSONObject ensureAddArrayFirstValueCommon(JSONObject o, Cursor c,
+            String jsonName, String nameString) {
         try {
             if (o == null) {
                 o = new JSONObject();
@@ -169,32 +176,38 @@ public class ContactFinder {
                 o.put(jsonName, nameArray);
             }
         } catch (JSONException e) {
-            Log.e(mTag, "addArrayFirstValueCommon() - Failed to build json data: "+e);
+            Log.e(mTag, "addArrayFirstValueCommon() - Failed to build json data: "
+                    + e);
         }
         return o;
     }
 
-    private JSONArray addTypeArray(JSONArray array, Cursor c, String data, Map<String, String> typeMap,
-            Map<String, Integer> typeValuesMap) {
+    private JSONArray addTypeArray(JSONArray array, Cursor c, String data,
+            Map<String, String> typeMap, Map<String, Integer> typeValuesMap) {
         try {
             if (array == null) {
                 array = new JSONArray();
             }
             final String primary = typeMap.get("isSuperPrimary");
-            final String preferred = (c.getString(c.getColumnIndex(primary)) == "1") ? "true" : "false";
+            final String preferred = 
+                    (c.getString(c.getColumnIndex(primary)).equals("1"))
+                            ? "true" : "false";
             JSONObject o = new JSONObject();
             o.put("preferred", preferred);
-            ensureAddArrayFirstValue(o, c, "types", typeMap.get("type"), typeValuesMap);
+            ensureAddArrayFirstValue(o, c, "types", typeMap.get("type"),
+                    typeValuesMap);
             String value = c.getString(c.getColumnIndex(data));
-            if (c.getString(c.getColumnIndex(Data.MIMETYPE)).equals(Im.CONTENT_ITEM_TYPE)) {
+            if (c.getString(c.getColumnIndex(Data.MIMETYPE))
+                    .equals(Im.CONTENT_ITEM_TYPE)) {
                 int protocol = c.getInt(c.getColumnIndex(Im.PROTOCOL));
-                String prefix = ContactUtils.getKeyFromValue(ContactConstants.imProtocolMap, protocol);
+                String prefix = ContactUtils.getKeyFromValue(
+                        ContactConstants.imProtocolMap, protocol);
                 value = prefix+':'+value;
             }
             o.put("value", value);
             array.put(o);
         } catch (JSONException e) {
-            Log.e(mTag, "addTypeArray() - Failed to build json data: "+e);
+            Log.e(mTag, "addTypeArray() - Failed to build json data: " + e);
         }
         return array;
     }
@@ -229,7 +242,8 @@ public class ContactFinder {
         return order.substring(0, order.length()-1);
     }
 
-    public JSONArray getContacts(Set<String> contactIds, String sortOrder, Long resultsLimit) {
+    public JSONArray getContacts(
+            Set<String> contactIds, String sortOrder, Long resultsLimit) {
         if (contactIds.size() == 0) {
             return null;
         }
@@ -239,10 +253,12 @@ public class ContactFinder {
             Map<Long, ContactData> dataMap = new LinkedHashMap<Long, ContactData>();
 
             // Get all records of these contactIds
-            String where = Data.CONTACT_ID + " in (" + ContactUtils.MakeQuestionMarkList(contactIds) + ")";
+            String where = Data.CONTACT_ID + " in ("
+                    + ContactUtils.makeQuestionMarkList(contactIds) + ")";
             String[] whereArgs = contactIds.toArray(new String[contactIds.size()]);
 
-            Cursor c = mUtils.mResolver.query(Data.CONTENT_URI, null, where, whereArgs, sortOrder);
+            Cursor c = mUtils.mResolver.query(
+                    Data.CONTENT_URI, null, where, whereArgs, sortOrder);
             while (c.moveToNext()) {
                 long id = c.getLong(c.getColumnIndex(Data.CONTACT_ID));
                 if (!dataMap.containsKey(id)) {
@@ -251,54 +267,74 @@ public class ContactFinder {
                 ContactData d = dataMap.get(id);
                 String mime = c.getString(c.getColumnIndex(Data.MIMETYPE));
                 if (mime.equals(ContactConstants.CUSTOM_MIMETYPE_LASTUPDATED)) {
-                    d.lastUpdated = ContactConstants.jsonDateFormat.format(ContactConstants.androidDateFormat.parse(
-                            c.getString(c.getColumnIndex(Data.DATA1))));
+                    d.lastUpdated = ContactConstants.jsonDateFormat.format(
+                            ContactConstants.androidDateFormat.parse(
+                                    c.getString(c.getColumnIndex(Data.DATA1))));
                 } else if (mime.equals(StructuredName.CONTENT_ITEM_TYPE)) {
-                    d.oName = ensureAddString(d.oName, c, "displayName", StructuredName.DISPLAY_NAME);
-                    d.oName = ensureAddArrayFirstValue(d.oName, c, "honorificPrefixes", StructuredName.PREFIX);
-                    d.oName = ensureAddArrayFirstValue(d.oName, c, "givenNames", StructuredName.GIVEN_NAME);
-                    d.oName = ensureAddArrayFirstValue(d.oName, c, "additionalNames", StructuredName.MIDDLE_NAME);
-                    d.oName = ensureAddArrayFirstValue(d.oName, c, "familyNames", StructuredName.FAMILY_NAME);
-                    d.oName = ensureAddArrayFirstValue(d.oName, c, "honorificSuffixes", StructuredName.SUFFIX);
+                    d.oName = ensureAddString(
+                            d.oName, c, "displayName", StructuredName.DISPLAY_NAME);
+                    d.oName = ensureAddArrayFirstValue(
+                            d.oName, c, "honorificPrefixes", StructuredName.PREFIX);
+                    d.oName = ensureAddArrayFirstValue(
+                            d.oName, c, "givenNames", StructuredName.GIVEN_NAME);
+                    d.oName = ensureAddArrayFirstValue(d.oName,
+                            c, "additionalNames", StructuredName.MIDDLE_NAME);
+                    d.oName = ensureAddArrayFirstValue(d.oName,
+                            c, "familyNames", StructuredName.FAMILY_NAME);
+                    d.oName = ensureAddArrayFirstValue(d.oName,
+                            c, "honorificSuffixes", StructuredName.SUFFIX);
                 } else if (mime.equals(Nickname.CONTENT_ITEM_TYPE)) {
-                    d.oName = ensureAddArrayFirstValue(d.oName, c, "nicknames", Nickname.NAME);
+                    d.oName = ensureAddArrayFirstValue(
+                            d.oName, c, "nicknames", Nickname.NAME);
                 } else if (mime.equals(Email.CONTENT_ITEM_TYPE)) {
-                    d.aEmails = addTypeArray(d.aEmails, c, Email.DATA,
-                            ContactConstants.emailTypeMap, ContactConstants.emailTypeValuesMap);
+                    d.aEmails = addTypeArray(d.aEmails, c,
+                            Email.DATA, ContactConstants.emailTypeMap,
+                                    ContactConstants.emailTypeValuesMap);
                 } else if (mime.equals(Photo.CONTENT_ITEM_TYPE)) {
                     d.aPhotos = ensureAddString(d.aPhotos, c, Photo.PHOTO);
                 } else if (mime.equals(Website.CONTENT_ITEM_TYPE)) {
-                    d.aUrls = addTypeArray(d.aUrls, c, Website.DATA,
-                            ContactConstants.websiteTypeMap, ContactConstants.websiteTypeValuesMap);
+                    d.aUrls = addTypeArray(d.aUrls, c,
+                            Website.DATA, ContactConstants.websiteTypeMap,
+                                    ContactConstants.websiteTypeValuesMap);
                 } else if (mime.equals(GroupMembership.CONTENT_ITEM_TYPE)) {
-                    String title = mUtils.getGroupTitle(c.getString(c.getColumnIndex(GroupMembership.GROUP_ROW_ID)));
+                    String title = mUtils.getGroupTitle(c.getString(
+                              c.getColumnIndex(GroupMembership.GROUP_ROW_ID)));
                     if (d.aCategories == null) {
                         d.aCategories = new JSONArray();
                     }
                     d.aCategories.put(title);
                 } else if (mime.equals(StructuredPostal.CONTENT_ITEM_TYPE)) {
                     d.aAddresses = addTypeArray(d.aAddresses, c,
-                            StructuredPostal.DATA, ContactConstants.addressTypeMap, ContactConstants.addressTypeValuesMap);
+                            StructuredPostal.DATA, ContactConstants.addressTypeMap,
+                                    ContactConstants.addressTypeValuesMap);
                 } else if (mime.equals(Phone.CONTENT_ITEM_TYPE)) {
-                    d.aNumbers = addTypeArray(d.aNumbers, c, Phone.DATA,
-                            ContactConstants.phoneTypeMap, ContactConstants.phoneTypeValuesMap);
+                    d.aNumbers = addTypeArray(d.aNumbers, c,
+                            Phone.DATA, ContactConstants.phoneTypeMap,
+                                    ContactConstants.phoneTypeValuesMap);
                 } else if (mime.equals(Organization.CONTENT_ITEM_TYPE)) {
-                    d.aOrganizations = ensureAddString(d.aOrganizations, c, Organization.COMPANY);
+                    d.aOrganizations = ensureAddString(
+                            d.aOrganizations, c, Organization.COMPANY);
                 } else if (mime.equals(Organization.CONTENT_ITEM_TYPE)) {
-                    d.aJobTitles = ensureAddString(d.aJobTitles, c, Organization.TITLE);
+                    d.aJobTitles = ensureAddString(
+                            d.aJobTitles, c, Organization.TITLE);
                 } else if (mime.equals(Event.CONTENT_ITEM_TYPE)) {
-                    int type = Integer.valueOf(c.getString(c.getColumnIndex(Event.TYPE)));
+                    int type = Integer.valueOf(
+                            c.getString(c.getColumnIndex(Event.TYPE)));
                     if (type == Event.TYPE_BIRTHDAY) {
-                        d.birthday = ContactConstants.jsonDateFormat.format(ContactConstants.androidDateFormat.parse(
-                                c.getString(c.getColumnIndex(Event.START_DATE))));
+                        d.birthday = ContactConstants.jsonDateFormat.format(
+                                ContactConstants.androidDateFormat.parse(c.getString(
+                                        c.getColumnIndex(Event.START_DATE))));
                     } else if (type == Event.TYPE_ANNIVERSARY) {
-                        d.anniversary = ContactConstants.jsonDateFormat.format(ContactConstants.androidDateFormat.parse(
-                                c.getString(c.getColumnIndex(Event.START_DATE))));
+                        d.anniversary = ContactConstants.jsonDateFormat.format(
+                                ContactConstants.androidDateFormat.parse(c.getString(
+                                        c.getColumnIndex(Event.START_DATE))));
                     }
                 } else if (mime.equals(Note.CONTENT_ITEM_TYPE)) {
                     d.aNotes = ensureAddString(d.aNotes, c, Note.NOTE);
                 } else if (mime.equals(Im.CONTENT_ITEM_TYPE)) {
-                    d.aImpp = addTypeArray(d.aImpp, c, Im.DATA, ContactConstants.imTypeMap, ContactConstants.imTypeValuesMap);
+                    d.aImpp = addTypeArray(d.aImpp, c,
+                            Im.DATA, ContactConstants.imTypeMap,
+                                    ContactConstants.imTypeValuesMap);
                 } else if (mime.equals(ContactConstants.CUSTOM_MIMETYPE_GENDER)) {
                     d.gender = c.getString(c.getColumnIndex(Data.DATA1));
                 }
@@ -314,7 +350,7 @@ public class ContactFinder {
             }
             return returnArray;
         } catch (ParseException e) {
-            Log.e(mTag, "getContacts() failed: "+e);
+            Log.e(mTag, "getContacts() failed: " + e);
             return null;
         }
     }
@@ -341,28 +377,32 @@ public class ContactFinder {
                 operator = " LIKE ";
                 value = "%" + value + "%";
             } else {
-                Log.e(mTag, "Wrong FilterOperator: ["+operator+"], should be 'is' or 'contains'");
+                Log.e(mTag, "Wrong FilterOperator: [" + operator
+                        + "], should be 'is' or 'contains'");
                 return null;
             }
             for (String field : fields) {
                 // e.g. for "givenName" should check column of "givenNames".
                 String column = ContactConstants.findFieldMap.get(field);
-                android.util.Pair<String, String> name = ContactConstants.contactDataMap.get(column);
+                android.util.Pair<String, String> name =
+                        ContactConstants.contactDataMap.get(column);
                 // e.g. first is GIVEN_NAME, second is StructuredName.MIMETYPE
-                where += name.first + operator + " ? AND " + Data.MIMETYPE + " = ? or ";
+                where += name.first + operator + " ? AND "
+                        + Data.MIMETYPE + " = ? or ";
                 args.add(value);
                 args.add(name.second);
             }
-            where = where.substring(0, where.length()-3); // Remove the "or " which appended in the loop above
+            // Remove the "or " which appended in the loop above
+            where = where.substring(0, where.length()-3);
             String[] whereArgs = args.toArray(new String[args.size()]);
 
             findIdOption = new FindOption(where, whereArgs, null);
         }
         String resultsLimitString = findJson.getString("resultsLimit");
-        Long resultsLimitLong = (resultsLimitString == null) ? null : Long.valueOf(resultsLimitString);
-        return getContacts(
-                getContactIds(findIdOption),
-                getSortOrder(findJson.getStringArray("sortBy"), findJson.getString("sortOrder")),
-                resultsLimitLong);
+        Long resultsLimitLong = (resultsLimitString == null)
+                ? null : Long.valueOf(resultsLimitString);
+        return getContacts(getContactIds(findIdOption), getSortOrder(
+                findJson.getStringArray("sortBy"), findJson.getString("sortOrder")),
+                        resultsLimitLong);
     }
 }

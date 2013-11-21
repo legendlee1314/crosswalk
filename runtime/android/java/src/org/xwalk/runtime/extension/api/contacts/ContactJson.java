@@ -1,4 +1,6 @@
-package org.xwalk.runtime.extension.api.Contacts;
+package org.xwalk.runtime.extension.api.contacts;
+
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,8 +8,6 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import android.util.Log;
 
 public class ContactJson {
 
@@ -22,7 +22,7 @@ public class ContactJson {
         try {
             mObject = new JSONObject(init);
         } catch (JSONException e) {
-            Log.e(TAG, "Init JSON by " + init + " failed: "+e);
+            Log.e(TAG, "Init JSON by " + init + " failed: " + e);
         }
     }
 
@@ -31,11 +31,12 @@ public class ContactJson {
         if (mObject != null && mObject.has(name)) {
             try {
                 JSONArray jsonArray = mObject.getJSONArray(name);
-                for (int i=0; i<jsonArray.length(); i++) {
-                    list.add( jsonArray.getString(i) );
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    list.add(jsonArray.getString(i));
                 }
             } catch (JSONException e) {
-                Log.e(TAG, "getArrayFirstValue(" + name + "): Failed to parse json data: "+e);
+                Log.e(TAG, "getArrayFirstValue(" + name
+                        + "): Failed to parse json data: " + e);
             }
         }
         return list;
@@ -47,7 +48,8 @@ public class ContactJson {
             try {
                 value = mObject.getJSONArray(name).getString(0);
             } catch (JSONException e) {
-                Log.e(TAG, "getArrayFirstValue(" + name + "): Failed to parse json data: "+e);
+                Log.e(TAG, "getArrayFirstValue(" + name
+                        + "): Failed to parse json data: " + e);
             }
         }
         return value;
@@ -59,7 +61,8 @@ public class ContactJson {
             try {
                 value = mObject.getString(name);
             } catch (JSONException e) {
-                Log.e(TAG, "getString(" + name + "): Failed to parse json data: "+e);
+                Log.e(TAG, "getString(" + name
+                        + "): Failed to parse json data: " + e);
             }
         }
         return value;
@@ -71,7 +74,8 @@ public class ContactJson {
             try {
                 value = mObject.getBoolean(name);
             } catch (JSONException e) {
-                Log.e(TAG, "getBoolean(" + name + "): Failed to parse json data: "+e);
+                Log.e(TAG, "getBoolean(" + name
+                        + "): Failed to parse json data: "+e);
             }
         }
         return value;
@@ -83,7 +87,8 @@ public class ContactJson {
             try {
                 o = mObject.getJSONObject(name);
             } catch (JSONException e) {
-                Log.e(TAG, "getObject(" + name + "): Failed to parse json data: "+e);
+                Log.e(TAG, "getObject(" + name
+                        + "): Failed to parse json data: "+e);
             }
         }
         return o;

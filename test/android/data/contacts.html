@@ -5,7 +5,8 @@
 <style type="text/css">
   body { margin: auto; width: 100%; }
   div { margin: 15; padding: 10; width: 100%; }
-  textarea { margin: 10; padding: 10; width: 95%; height: 15%; font-size: 12; resize: none;}
+  textarea { margin: 10; padding: 10; width: 95%; height: 15%; font-size: 12; resize: none; }
+  .button { margin: 10; padding: 10; width: 80%; height: 5%; font-size: 40; }
   .title { margin: 20; padding: 20; font-size: 42; font-weight: bold; }
   .subtitle { margin: 10; padding: 10; font-size: 32; }
   .text { font-size: 25; }
@@ -80,7 +81,7 @@ window.onload = function() {
 
   var saveCallback = function(contact) {
     var output = '';
-    if (firstID==-1) {
+    if (firstID == -1) {
       firstID = contact.id;
     } else {
       secondID = contact.id;
@@ -101,7 +102,7 @@ window.onload = function() {
       contact.name.givenNames[0] + ' ' +
       contact.name.familyNames[0] + ',<br>phone number: ' +
       contact.phoneNumbers[0].value;
-    document.getElementById('update').innerHTML = output;
+    document.getElementById('update').innerHTML += output;
     contact.phoneNumbers[0].value = expectedNewPhoneNumber;
     navigator.contacts.save(contact).done(updateDoneCallback, errorCallback);
   };
@@ -132,9 +133,9 @@ window.onload = function() {
   };
 
   var findDoneCallback = function(contacts) {
-    var output = 'Found '+contacts.length+' contact(s):';
+    var output = 'Found '+contacts.length + ' contact(s):';
     output += '<p>';
-    for(var i=0, l=contacts.length; i<l; ++i) {
+    for(var i = 0, l = contacts.length; i < l; ++i) {
       output += contacts[i].name.givenNames[0] + ' '
                 + contacts[i].name.familyNames[0] + '<br>';
     }
@@ -142,7 +143,7 @@ window.onload = function() {
     onSuccess();
     navigator.contacts.remove(firstID);
     navigator.contacts.remove(secondID);
-    output = "Contacts "+firstID+" and "+secondID+" are removed";
+    output = "Contacts " + firstID + " and " + secondID + " are removed";
     document.getElementById('remove').innerHTML = output;
   };
 
@@ -165,30 +166,30 @@ window.onload = function() {
   try {
     navigator.contacts.addEventListener('oncontactschange', function(data) {
         var output = document.getElementById('event');
+        output.value += 'contacts changes:\n';
         if (data.added) {
           var msg = 'added: ';
           for (var i = 0; i < data.added.length; ++i) {
              msg += data.added[i] + '|';
           }
-          output.value += 'contacts changes:\n' + msg + '\n--------\n';
-          output.scrollTop = output.scrollHeight;
+          output.value += msg + '\n';
         }
         if (data.removed) {
           var msg = 'removed: ';
           for (var i = 0; i < data.removed.length; ++i) {
              msg += data.removed[i] + '|';
           }
-          output.value += 'contacts changes:\n' + msg + '\n--------\n';
-          output.scrollTop = output.scrollHeight;
+          output.value += msg + '\n';
         }
         if (data.modified) {
           var msg = 'modified: ';
           for (var i = 0; i < data.modified.length; ++i) {
              msg += data.modified[i] + '|';
           }
-          output.value += 'contacts changes:\n' + msg + '\n--------\n';
-          output.scrollTop = output.scrollHeight;
+          output.value += msg + '\n';
         }
+        output.value += '-----------\n';
+        output.scrollTop = output.scrollHeight;
       });
   } catch(e) {
     console.log(e);
@@ -210,6 +211,19 @@ window.onload = function() {
       .done(findStartCallback, errorCallback); // and then find a contact
   } catch(e) {
     console.log(e);
+  }
+
+  document.getElementById("event_btn").onclick = function() {
+    try {
+      contact.name.givenNames[0] = 'Bob';
+      contact.name.familyNames[0] = 'George';
+      contact.phoneNumbers[0].value = '+01010101';
+      navigator.contacts.save(contact)
+        .done(saveCallback, errorCallback)
+        .done(updateStartCallback, errorCallback);
+    } catch(e) {
+      console.log(e);
+    }
   }
 };
 
@@ -239,6 +253,7 @@ window.onload = function() {
 
 <div class="event">
   <p class="subtitle center">Contact Event</p>
+  <button class="button" id="event_btn">TestBtn after `onResume()`</button>
   <textarea id="event" readonly=true></textarea>
 </div>
 

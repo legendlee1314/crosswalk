@@ -1,11 +1,5 @@
-package org.xwalk.runtime.extension.api.Contacts;
+package org.xwalk.runtime.extension.api.contacts;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Event;
 import android.provider.ContactsContract.CommonDataKinds.GroupMembership;
@@ -21,11 +15,21 @@ import android.provider.ContactsContract.CommonDataKinds.Website;
 import android.provider.ContactsContract.Data;
 import android.util.Pair;
 
-public class ContactConstants {
-    public static final String CUSTOM_MIMETYPE_LASTUPDATED = "vnd.android.cursor.item/contact_custom_lastupdated";
-    public static final String CUSTOM_MIMETYPE_GENDER = "vnd.android.cursor.item/contact_custom_gender";
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-    public static final Map<String, String> findFieldMap = createStringMap(new String[]{
+public class ContactConstants {
+    public static final String CUSTOM_MIMETYPE_LASTUPDATED =
+            "vnd.android.cursor.item/contact_custom_lastupdated";
+    public static final String CUSTOM_MIMETYPE_GENDER =
+            "vnd.android.cursor.item/contact_custom_gender";
+
+    public static final Map<String, String> findFieldMap =
+            createStringMap(new String[]{
         "familyName", "familyNames",
         "givenName", "givenNames",
         "middleName", "middleNames",
@@ -43,17 +47,20 @@ public class ContactConstants {
         // TODO(hdq): Should birthday and anniversary be distinguished?
     });
 
-    public static final Map<String, Pair<String, String>> contactDataMap = createTripleMap(new String[]{
+    public static final Map<String, Pair<String, String>> contactDataMap =
+            createTripleMap(new String[]{
         "id", Data.CONTACT_ID, null,
         "displayName", StructuredName.DISPLAY_NAME, StructuredName.CONTENT_ITEM_TYPE,
         "familyNames", StructuredName.FAMILY_NAME, StructuredName.CONTENT_ITEM_TYPE,
         "givenNames", StructuredName.GIVEN_NAME, StructuredName.CONTENT_ITEM_TYPE,
         "middleNames", StructuredName.MIDDLE_NAME, StructuredName.CONTENT_ITEM_TYPE,
-        "additionalNames", StructuredName.MIDDLE_NAME, StructuredName.CONTENT_ITEM_TYPE,
+        "additionalNames",
+                StructuredName.MIDDLE_NAME, StructuredName.CONTENT_ITEM_TYPE,
         "honorificPrefixes", StructuredName.PREFIX, StructuredName.CONTENT_ITEM_TYPE,
         "honorificSuffixes", StructuredName.SUFFIX, StructuredName.CONTENT_ITEM_TYPE,
         "nickNames", Nickname.NAME, Nickname.CONTENT_ITEM_TYPE,
-        "categories", GroupMembership.GROUP_ROW_ID, GroupMembership.CONTENT_ITEM_TYPE,
+        "categories",
+                GroupMembership.GROUP_ROW_ID, GroupMembership.CONTENT_ITEM_TYPE,
         "gender", Data.DATA1, CUSTOM_MIMETYPE_GENDER,
         "lastUpdated", Data.DATA1, CUSTOM_MIMETYPE_LASTUPDATED,
         "birthday", Data.DATA1, Event.CONTENT_ITEM_TYPE,
@@ -64,7 +71,8 @@ public class ContactConstants {
         "phoneNumbers", Phone.NUMBER, Phone.CONTENT_ITEM_TYPE,
         "addresses", null, StructuredPostal.CONTENT_ITEM_TYPE,
         "streetAddress", StructuredPostal.STREET, StructuredPostal.CONTENT_ITEM_TYPE,
-        "locality", StructuredPostal.NEIGHBORHOOD, StructuredPostal.CONTENT_ITEM_TYPE,
+        "locality",
+                StructuredPostal.NEIGHBORHOOD, StructuredPostal.CONTENT_ITEM_TYPE,
         "region", StructuredPostal.REGION, StructuredPostal.CONTENT_ITEM_TYPE,
         "postalCode", StructuredPostal.POSTCODE, StructuredPostal.CONTENT_ITEM_TYPE,
         "countryName", StructuredPostal.COUNTRY, StructuredPostal.CONTENT_ITEM_TYPE,
@@ -74,18 +82,21 @@ public class ContactConstants {
         "impp", Im.DATA, Im.CONTENT_ITEM_TYPE
     });
 
-    public static Map<String, Pair<String, String>> createTripleMap(String[] triplets) {
-        Map<String, Pair<String, String>> result = new HashMap<String, Pair<String, String>>();
-        for (int i=0; i<triplets.length; i+=3) {
-            result.put(triplets[i], new Pair<String, String>(triplets[i+1], triplets[i+2]));
+    public static Map<String, Pair<String, String>> createTripleMap(
+            String[] triplets) {
+        Map<String, Pair<String, String>> result =
+                new HashMap<String, Pair<String, String>>();
+        for (int i = 0; i < triplets.length; i += 3) {
+            result.put(triplets[i],
+                    new Pair<String, String>(triplets[i + 1], triplets[i + 2]));
         }
         return Collections.unmodifiableMap(result);
     }
 
     public static Map<String, String> createStringMap(String[] pairs) {
         Map<String, String> result = new HashMap<String, String>();
-        for (int i=0; i<pairs.length; i+=2) {
-          result.put(pairs[i], pairs[i+1]);
+        for (int i = 0; i < pairs.length; i += 2) {
+          result.put(pairs[i], pairs[i + 1]);
         }
         return Collections.unmodifiableMap(result);
     }
@@ -98,16 +109,23 @@ public class ContactConstants {
         return createStringMap(new String[]{name, "value"});
     }
 
-    public static final Map<String, String> photoDataMap = createDataMap(Photo.PHOTO);
-    public static final Map<String, String> companyDataMap = createDataMap(Organization.COMPANY);
-    public static final Map<String, String> jobtitleDataMap = createDataMap(Organization.TITLE);
-
-    public static final Map<String, String> emailDataMap = createValueMap(Email.DATA);
-    public static final Map<String, String> websiteDataMap = createValueMap(Website.DATA);
-    public static final Map<String, String> phoneDataMap = createValueMap(Phone.DATA);
-    public static final Map<String, String> noteDataMap = createValueMap(Note.NOTE);
+    public static final Map<String, String> photoDataMap =
+            createDataMap(Photo.PHOTO);
+    public static final Map<String, String> companyDataMap =
+            createDataMap(Organization.COMPANY);
+    public static final Map<String, String> jobtitleDataMap =
+            createDataMap(Organization.TITLE);
+    public static final Map<String, String> emailDataMap =
+            createValueMap(Email.DATA);
+    public static final Map<String, String> websiteDataMap =
+            createValueMap(Website.DATA);
+    public static final Map<String, String> phoneDataMap =
+            createValueMap(Phone.DATA);
+    public static final Map<String, String> noteDataMap =
+            createValueMap(Note.NOTE);
     public static final Map<String, String> imDataMap = createValueMap(Im.DATA);
-    public static final Map<String, String> addressDataMap = createStringMap(new String[]{
+    public static final Map<String, String> addressDataMap =
+            createStringMap(new String[]{
         StructuredPostal.STREET, "streetAddress",
         StructuredPostal.NEIGHBORHOOD, "locality",
         StructuredPostal.REGION, "region",
@@ -115,49 +133,56 @@ public class ContactConstants {
         StructuredPostal.COUNTRY, "countryName"});
 
     @SuppressWarnings("serial")
-    public static final Map<String, String> emailTypeMap = new HashMap<String, String>(){{
+    public static final Map<String, String> emailTypeMap =
+            new HashMap<String, String>() { {
         put("type", Email.TYPE);
         put("isPrimary", Email.IS_PRIMARY);
         put("isSuperPrimary", Email.IS_SUPER_PRIMARY);
-    }};
+    } };
 
     @SuppressWarnings("serial")
-    public static final Map<String, String> websiteTypeMap = new HashMap<String, String>(){{
+    public static final Map<String, String> websiteTypeMap =
+            new HashMap<String, String>() { {
         put("type", Website.TYPE);
         put("isPrimary", Website.IS_PRIMARY);
         put("isSuperPrimary", Website.IS_SUPER_PRIMARY);
-    }};
+    } };
 
     @SuppressWarnings("serial")
-    public static final Map<String, String> addressTypeMap = new HashMap<String, String>(){{
+    public static final Map<String, String> addressTypeMap =
+            new HashMap<String, String>() { {
         put("type", StructuredPostal.TYPE);
         put("isPrimary", StructuredPostal.IS_PRIMARY);
         put("isSuperPrimary", StructuredPostal.IS_SUPER_PRIMARY);
-    }};
+    } };
 
     @SuppressWarnings("serial")
-    public static final Map<String, String> phoneTypeMap = new HashMap<String, String>(){{
+    public static final Map<String, String> phoneTypeMap =
+            new HashMap<String, String>() { {
         put("type", Phone.TYPE);
         put("isPrimary", Phone.IS_PRIMARY);
         put("isSuperPrimary", Phone.IS_SUPER_PRIMARY);
-    }};
+    } };
 
     @SuppressWarnings("serial")
-    public static final Map<String, String> imTypeMap = new HashMap<String, String>(){{
+    public static final Map<String, String> imTypeMap =
+            new HashMap<String, String>() { {
         put("type", Im.TYPE);
         put("isPrimary", Im.IS_PRIMARY);
         put("isSuperPrimary", Im.IS_SUPER_PRIMARY);
-    }};
+    } };
 
     @SuppressWarnings("serial")
-    public static final Map<String, Integer> emailTypeValuesMap = new HashMap<String, Integer>(){{
+    public static final Map<String, Integer> emailTypeValuesMap =
+            new HashMap<String, Integer>() { {
         put("work", Email.TYPE_WORK);
         put("home", Email.TYPE_HOME);
         put("mobile", Email.TYPE_MOBILE);
-    }};
+    } };
 
     @SuppressWarnings("serial")
-    public static final Map<String, Integer> websiteTypeValuesMap = new HashMap<String, Integer>(){{
+    public static final Map<String, Integer> websiteTypeValuesMap =
+            new HashMap<String, Integer>() { {
         put("blog", Website.TYPE_BLOG);
         put("ftp", Website.TYPE_FTP);
         put("home", Website.TYPE_HOME);
@@ -165,17 +190,19 @@ public class ContactConstants {
         put("other", Website.TYPE_OTHER);
         put("profile", Website.TYPE_PROFILE);
         put("work", Website.TYPE_WORK);
-    }};
+    } };
 
     @SuppressWarnings("serial")
-    public static final Map<String, Integer> addressTypeValuesMap = new HashMap<String, Integer>(){{
+    public static final Map<String, Integer> addressTypeValuesMap =
+            new HashMap<String, Integer>() { {
         put("work", StructuredPostal.TYPE_WORK);
         put("home", StructuredPostal.TYPE_HOME);
         put("other", StructuredPostal.TYPE_OTHER);
-    }};
+    } };
 
     @SuppressWarnings("serial")
-    public static final Map<String, Integer> phoneTypeValuesMap = new HashMap<String, Integer>(){{
+    public static final Map<String, Integer> phoneTypeValuesMap =
+            new HashMap<String, Integer>() { {
         put("home", Phone.TYPE_HOME);
         put("mobile", Phone.TYPE_MOBILE);
         put("work", Phone.TYPE_WORK);
@@ -196,17 +223,19 @@ public class ContactConstants {
         put("work_pager", Phone.TYPE_WORK_PAGER);
         put("assistant", Phone.TYPE_ASSISTANT);
         put("mms", Phone.TYPE_MMS);
-    }};
+    } };
 
     @SuppressWarnings("serial")
-    public static final Map<String, Integer> imTypeValuesMap = new HashMap<String, Integer>(){{
+    public static final Map<String, Integer> imTypeValuesMap =
+            new HashMap<String, Integer>() { {
         put("work", Im.TYPE_WORK);
         put("home", Im.TYPE_HOME);
         put("other", Im.TYPE_OTHER);
-    }};
+    } };
 
     @SuppressWarnings("serial")
-    public static final Map<String, Integer> imProtocolMap = new HashMap<String, Integer>(){{
+    public static final Map<String, Integer> imProtocolMap =
+            new HashMap<String, Integer>() { {
         put("aim", Im.PROTOCOL_AIM);
         put("msn", Im.PROTOCOL_MSN);
         put("ymsgr", Im.PROTOCOL_YAHOO);
@@ -216,10 +245,13 @@ public class ContactConstants {
         put("icq", Im.PROTOCOL_ICQ);
         put("jabber", Im.PROTOCOL_JABBER);
         put("netmeeting", Im.PROTOCOL_NETMEETING);
-    }};
+    } };
 
-    public static final SimpleDateFormat jsonDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.getDefault());
-    public static final SimpleDateFormat androidDateFormat = new SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault());
+    public static final SimpleDateFormat jsonDateFormat =
+            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+                    java.util.Locale.getDefault());
+    public static final SimpleDateFormat androidDateFormat =
+            new SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault());
 
     public static class ContactMap {
         public String name;
@@ -227,7 +259,8 @@ public class ContactConstants {
         public Map<String, String> dataMap;
         public Map<String, String> typeMap;
         public Map<String, Integer> typeValueMap;
-        public ContactMap(String n, Map<String, String> datas, Map<String, String> types, Map<String, Integer> typeValues) {
+        public ContactMap(String n, Map<String, String> datas,
+                  Map<String, String> types, Map<String, Integer> typeValues) {
             this.name = n;
             this.mimeType = contactDataMap.get(n).second;
             this.dataMap = datas;
@@ -237,15 +270,20 @@ public class ContactConstants {
     }
 
     @SuppressWarnings("serial")
-    public static final List<ContactMap> contactMapList = new ArrayList<ContactMap>(){{
-        add(new ContactMap("emails", emailDataMap, emailTypeMap, emailTypeValuesMap));
+    public static final List<ContactMap> contactMapList =
+            new ArrayList<ContactMap>() { {
+        add(new ContactMap("emails", emailDataMap,
+                emailTypeMap, emailTypeValuesMap));
         add(new ContactMap("photos", photoDataMap, null, null));
-        add(new ContactMap("urls", websiteDataMap, websiteTypeMap, websiteTypeValuesMap));
-        add(new ContactMap("phoneNumbers", phoneDataMap, phoneTypeMap, phoneTypeValuesMap));
-        add(new ContactMap("addresses", addressDataMap, addressTypeMap, addressTypeValuesMap));
+        add(new ContactMap("urls", websiteDataMap,
+                websiteTypeMap, websiteTypeValuesMap));
+        add(new ContactMap("phoneNumbers", phoneDataMap,
+                phoneTypeMap, phoneTypeValuesMap));
+        add(new ContactMap("addresses", addressDataMap,
+                addressTypeMap, addressTypeValuesMap));
         add(new ContactMap("organizations", companyDataMap, null, null));
         add(new ContactMap("jobTitles", jobtitleDataMap, null, null));
         add(new ContactMap("notes", noteDataMap, null, null));
         add(new ContactMap("impp", imDataMap, imTypeMap, imTypeValuesMap));
-    }};
+    } };
 }

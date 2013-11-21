@@ -4,8 +4,6 @@
 
 package org.xwalk.runtime.extension.api.contacts;
 
-import org.xwalk.runtime.extension.api.Contacts.ContactBuilder;
-import org.xwalk.runtime.extension.api.Contacts.ContactFinder;
 import org.xwalk.runtime.extension.XWalkExtension;
 import org.xwalk.runtime.extension.XWalkExtensionContext;
 
@@ -30,14 +28,14 @@ public class Contacts extends XWalkExtension {
     private static final String TAG = "XWalkExtensionAPIContacts";
 
     private final ContactBuilder mBuilder;
-    private final ContactsEventListener mObserver;
+    private final ContactEventListener mObserver;
     private final ContentResolver mResolver;
 
     public Contacts(String jsApiContent, XWalkExtensionContext context) {
         super(NAME, jsApiContent, context);
         mResolver = context.getContext().getContentResolver();
         mBuilder = new ContactBuilder(mResolver, TAG);
-        mObserver = new ContactsEventListener(new Handler(), this, mResolver);
+        mObserver = new ContactEventListener(new Handler(), this, mResolver);
         mResolver.registerContentObserver(
                 ContactsContract.Contacts.CONTENT_URI, true, mObserver);
     }
@@ -84,6 +82,20 @@ public class Contacts extends XWalkExtension {
         } catch (JSONException e) {
             Log.e(TAG, e.toString());
         }
+    }
+
+    @Override
+    public void onResume() {
+        mObserver.onResume();
+        mResolver.registerContentObserver(
+                ContactsContract.Contacts.CONTENT_URI, true, mObserver);
+        Log.i(TAG, "onresume");
+    }
+
+    @Override
+    public void onPause() {
+        mResolver.unregisterContentObserver(mObserver);
+        Log.i(TAG, "onpause");
     }
 
     @Override
