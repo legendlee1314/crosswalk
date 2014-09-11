@@ -196,6 +196,7 @@
         'resource_dir': 'runtime/android/runtime_lib/res',
         'native_lib_target': 'libxwalkcore',
         'additional_input_paths': [
+          '<(PRODUCT_DIR)/xwalk_runtime_lib/assets/jsapi/ardrone_api.js',
           '<(PRODUCT_DIR)/xwalk_runtime_lib/assets/jsapi/contacts_api.js',
           '<(PRODUCT_DIR)/xwalk_runtime_lib/assets/jsapi/device_capabilities_api.js',
           '<(PRODUCT_DIR)/xwalk_runtime_lib/assets/jsapi/launch_screen_api.js',
@@ -247,6 +248,7 @@
           'files': [
             'experimental/launch_screen/launch_screen_api.js',
             'experimental/presentation/presentation_api.js',
+            'runtime/android/core_internal/src/org/xwalk/core/internal/extension/api/ardrone/ardrone_api.js',
             'runtime/android/core_internal/src/org/xwalk/core/internal/extension/api/contacts/contacts_api.js',
             'runtime/android/core_internal/src/org/xwalk/core/internal/extension/api/device_capabilities/device_capabilities_api.js',
             'runtime/android/core_internal/src/org/xwalk/core/internal/extension/api/messaging/messaging_api.js',

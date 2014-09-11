@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 
 import org.xwalk.core.internal.XWalkExtensionInternal;
+import org.xwalk.core.internal.extension.api.ardrone.ARDrone;
 import org.xwalk.core.internal.extension.api.contacts.Contacts;
 import org.xwalk.core.internal.extension.api.device_capabilities.DeviceCapabilities;
 import org.xwalk.core.internal.extension.api.launchscreen.LaunchScreenExtension;
@@ -87,6 +88,18 @@ public class BuiltinXWalkExtensions {
                         new Messaging(jsApiContent, activity));
             } catch(IOException e) {
                 Log.w(TAG, "Failed to read JS API file: " + Messaging.JS_API_PATH);
+            }
+        }
+
+        {
+            String jsApiContent = "";
+            try {
+                jsApiContent = getExtensionJSFileContent(
+                        context, ARDrone.JS_API_PATH, true);
+                sBuiltinExtensions.put(ARDrone.JS_API_PATH,
+                        new ARDrone(jsApiContent, activity));
+            } catch(IOException e) {
+                Log.w(TAG, "Failed to read JS API file: " + ARDrone.JS_API_PATH);
             }
         }
     }

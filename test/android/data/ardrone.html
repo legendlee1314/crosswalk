@@ -1,0 +1,80 @@
+<html>
+  <head>
+    <title></title>
+  </head>
+  <style type="text/css">
+    body { margin: auto; width: 100%; }
+    div { margin: 15; padding: 10; width: 100%; }
+    textarea { margin: 10; padding: 10; width: 95%; height: 15%; font-size: 12; resize: none;}
+    .title { margin: 20; padding: 20; font-size: 32; font-weight: bold; }
+    .subtitle { margin: 10; padding: 10; font-size: 25; }
+    .text { font-size: 18; }
+    .center { text-align: center; }
+    .button { height: 20%; width: 100%; }
+    .color_one { background-color: #FFFACD; }
+    .color_two { background-color: #CAE1FF; }
+    .color_three { background-color: #FFF0F5; }
+    .color_four { background-color: #F0FFF0; }
+    .color_five { background-color: #D1D1D1; }
+  </style>
+  <body>
+  <script>
+    var Error = function(error) {
+      document.title = "Fail";
+      console.log(error.message);
+    }
+
+    function enumerateAllProps(obj) {
+      var msg = '';
+      var props = Object.getOwnPropertyNames(obj);
+      for (var j = 0; j < props.length; ++j) {
+        msg += props[j] + ': ' + obj[props[j]] + '\n';
+      }
+      return msg;
+    }
+
+    var successCount = 0;
+    function onSuccess() {
+      // Only count the success get operation, the event part need manual interaction.
+      ++successCount;
+      if(successCount >= 5) {
+        document.title = "Pass";
+      }
+    }
+
+    window.onload = function() {
+      try {
+        var system = navigator.system || xwalk.experimental.system;
+        document.getElementById("connect").onclick = function () {
+          system.connect().then(function(msg) {
+            document.getElementById('message').innerHTML += '<br>' + enumerateAllProps(msg) + '<br>';
+            onSuccess();
+          }, Error);
+        };
+        document.getElementById("takeoff").onclick = function () {
+          system.takeoff().then(function(msg) {
+            document.getElementById('message').innerHTML += '<br>' + enumerateAllProps(msg) + '<br>';
+            onSuccess();
+          }, Error);
+        };
+        document.getElementById("landing").onclick = function () {
+          system.landing().then(function(msg) {
+            document.getElementById('message').innerHTML += '<br>' + enumerateAllProps(msg) + '<br>';
+            onSuccess();
+          }, Error);
+        };
+      } catch(e) {
+        console.log(e);
+      }
+    };
+  </script>
+  <div class="title center">Ardrone Control EXAMPLE</div>
+  <div class="event color_one">
+    <p class="subtitle center">Event</p>
+    <p class="text" id="message">Return Messages.</p>
+    <button class="button color_two" id="connect">Connect</button>
+    <button class="button color_three" id="takeoff">Takeoff</button>
+    <button class="button color_four" id="landing">Landing</button>
+  </div>
+  </body>
+</html>

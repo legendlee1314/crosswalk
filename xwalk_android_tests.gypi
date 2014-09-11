@@ -48,6 +48,7 @@
           '<(PRODUCT_DIR)/xwalk_xwview/assets/www/request_focus_right_frame.html',
           '<(PRODUCT_DIR)/xwalk_xwview/assets/www/request_focus_right_frame1.html',
           '<(PRODUCT_DIR)/xwalk_xwview/assets/xwalk.pak',
+          '<(PRODUCT_DIR)/xwalk_xwview/assets/jsapi/ardrone_api.js',
           '<(PRODUCT_DIR)/xwalk_xwview/assets/jsapi/contacts_api.js',
           '<(PRODUCT_DIR)/xwalk_xwview/assets/jsapi/device_capabilities_api.js',
           '<(PRODUCT_DIR)/xwalk_xwview/assets/jsapi/launch_screen_api.js',
@@ -79,6 +80,7 @@
           'files': [
             'experimental/launch_screen/launch_screen_api.js',
             'experimental/presentation/presentation_api.js',
+            'runtime/android/core_internal/src/org/xwalk/core/internal/extension/api/ardrone/ardrone_api.js',
             'runtime/android/core_internal/src/org/xwalk/core/internal/extension/api/contacts/contacts_api.js',
             'runtime/android/core_internal/src/org/xwalk/core/internal/extension/api/device_capabilities/device_capabilities_api.js',
             'runtime/android/core_internal/src/org/xwalk/core/internal/extension/api/messaging/messaging_api.js',
@@ -296,6 +298,7 @@
         'additional_input_paths': [
           '<(PRODUCT_DIR)/runtime_client_embedded_shell/assets/extensions-config.json',
           '<(PRODUCT_DIR)/runtime_client_embedded_shell/assets/index.html',
+          '<(PRODUCT_DIR)/runtime_client_embedded_shell/assets/jsapi/ardrone_api.js',
           '<(PRODUCT_DIR)/runtime_client_embedded_shell/assets/jsapi/contacts_api.js',
           '<(PRODUCT_DIR)/runtime_client_embedded_shell/assets/jsapi/device_capabilities_api.js',
           '<(PRODUCT_DIR)/runtime_client_embedded_shell/assets/jsapi/launch_screen_api.js',
@@ -340,6 +343,7 @@
           'files': [
             'experimental/launch_screen/launch_screen_api.js',
             'experimental/presentation/presentation_api.js',
+            'runtime/android/core_internal/src/org/xwalk/core/internal/extension/api/ardrone/ardrone_api.js',
             'runtime/android/core_internal/src/org/xwalk/core/internal/extension/api/contacts/contacts_api.js',
             'runtime/android/core_internal/src/org/xwalk/core/internal/extension/api/device_capabilities/device_capabilities_api.js',
             'runtime/android/core_internal/src/org/xwalk/core/internal/extension/api/messaging/messaging_api.js',
@@ -398,6 +402,7 @@
         'java_in_dir': 'test/android/runtime_client/javatests',
         'is_test_apk': 1,
         'additional_input_paths': [
+          '<(PRODUCT_DIR)/runtime_client_test/assets/ardrone.html',
           '<(PRODUCT_DIR)/runtime_client_test/assets/contacts.html',
           '<(PRODUCT_DIR)/runtime_client_test/assets/device_capabilities.html',
           '<(PRODUCT_DIR)/runtime_client_test/assets/displayAvailableTest.html',
@@ -414,6 +419,7 @@
         {
           'destination': '<(PRODUCT_DIR)/runtime_client_test/assets',
           'files': [
+            'test/android/data/ardrone.html',
             'test/android/data/contacts.html',
             'test/android/data/device_capabilities.html',
             'test/android/data/displayAvailableTest.html',
@@ -453,6 +459,7 @@
         'java_in_dir': 'test/android/runtime_client_embedded/javatests',
         'is_test_apk': 1,
         'additional_input_paths': [
+          '<(PRODUCT_DIR)/runtime_client_embedded_test/assets/ardrone.html',
           '<(PRODUCT_DIR)/runtime_client_embedded_test/assets/contacts.html',
           '<(PRODUCT_DIR)/runtime_client_embedded_test/assets/device_capabilities.html',
           '<(PRODUCT_DIR)/runtime_client_embedded_test/assets/displayAvailableTest.html',
@@ -469,6 +476,7 @@
         {
           'destination': '<(PRODUCT_DIR)/runtime_client_embedded_test/assets',
           'files': [
+            'test/android/data/ardrone.html',
             'test/android/data/contacts.html',
             'test/android/data/device_capabilities.html',
             'test/android/data/displayAvailableTest.html',
